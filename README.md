@@ -36,8 +36,8 @@ Set up permissions, groups, udev etc for spidev device on RPi:
 
     sudo ./install-spidev.sh
 
-Note that the pifaceio package is also available from PyPi so
-alternatively you can install it using pip.
+Note that the [pifaceio pypi package][pifaceio] is also available from
+[PyPi][pypi] so alternatively you can install it using [pip][].
 
 ### USAGE
 
@@ -155,5 +155,8 @@ Public License at <http://www.gnu.org/licenses/> for more details.
 [piface]: http://github.com/thomasmacpherson/piface
 [pifacedigitalio]: http://github.com/piface/pifacedigitalio
 [spidev]: http://github.com/doceme/py-spidev
+[pypi]: https://pypi.python.org/pypi
+[pip]: http://www.pip-installer.org/en/latest
+[pifaceio]: https://pypi.python.org/pypi/pifaceio
 
 <!-- vim: se ai et syn=markdown: -->

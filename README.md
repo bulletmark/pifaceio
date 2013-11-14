@@ -36,6 +36,9 @@ Set up permissions, groups, udev etc for spidev device on RPi:
 
     sudo ./install-spidev.sh
 
+Note that the pifaceio package is also available from PyPi so
+alternatively you can install it using pip.
+
 ### USAGE
 
 Board addresses, input pins, and output pins are always numbered from 0.

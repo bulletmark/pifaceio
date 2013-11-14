@@ -3,8 +3,8 @@ from setuptools import setup
 setup(
     name = 'pifaceio',
     py_modules = ['pifaceio'],
-    version = '1.02',
-    description = 'Simple interface for the Raspberry Pi PiFace board',
+    version = '1.04',
+    description = 'Simple python interface for the Raspberry Pi PiFace board',
     long_description = open('README.md').read(),
     keywords = ['piface', 'spidev', 'raspberrypi'],
     classifiers = [],
@@ -14,5 +14,6 @@ setup(
     license = 'GPLv3',
     install_requires = ['spidev'],
     scripts = ['install-spidev.sh'],
+    include_package_data = True,
     zip_safe = False,
 )

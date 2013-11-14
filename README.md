@@ -85,7 +85,7 @@ every 1 sec, on the default first PiFace board:
 
     while True:
         pf.write(pf.read())
-        time.sleep(1):
+        time.sleep(1)
 
 Same example, but do it across 4 PiFace boards:
 
@@ -95,7 +95,7 @@ Same example, but do it across 4 PiFace boards:
     while True:
         for pf in pifaces:
             pf.write(pf.read())
-        time.sleep(1):
+        time.sleep(1)
 
 Simple example to test if both input pin 0 and 1 are on at same time,
 and then set output pin 7 if true:
@@ -107,7 +107,7 @@ and then set output pin 7 if true:
     pf.read()
     first_two_inputs_on = pf.read_pin(0) and pf.read_pin(1)
 
-    # Now write that state to output pin 7:
+    # Now write that state to output pin 7
     pf.write_pin(7, first_two_inputs_on)
 
     # Do final (actual) write when all output pin states are set.

@@ -15,7 +15,9 @@ Interrupts are not supported. See [pifacedigitalio][] for interrupt and
 other functionality.
 
 The pifaceio package requires the [py-spidev][spidev] python package for
-interfacing to the linux spidev device.
+interfacing to the linux spidev device. Note that although the pifaceio
+code is compatible with both python 2 and 3, py-spidev unfortunately is
+currently only compatible with python 2.
 
 ### INSTALLATION
 

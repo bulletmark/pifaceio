@@ -24,8 +24,18 @@ class PiFace(object):
     count = 0
     spi = None
 
-    def __init__(self, board=0):
-        'PiFace board constructor. Piface board number = 0 (default) to 7'
+    def __init__(self, board=0, pull_ups=0xff, in_polarity=0x00,
+            out_polarity=0xff):
+        '''
+        PiFace board constructor.
+        board: Piface board number = 0 to 7, default = 0.
+        pull_ups: Input pull up mask, default = 0xff for all pull ups on.
+        in/out_polarity: Mask of bit states for pin to be considered ON.
+
+        Note that PiFace board by default has pullups enabled and the
+        inputs, e.g. the 4 pushbuttons, activate ON to ground so that
+        is why the default in_polarity is 0x00. I.e. 0 bit state is "ON".
+        '''
 
         # There can only be up to 8 MCP23S17 devices on SPI bus
         assert board in range(8)
@@ -36,6 +46,8 @@ class PiFace(object):
             PiFace.spi.open(0, 0)
 
         PiFace.count += 1
+        self.in_polarity = (~in_polarity) & 0xff
+        self.out_polarity = (~out_polarity) & 0xff
 
         # Set up the port data (see MCP23S17 data sheet)
         cmdw = 0x40 | (board << 1)
@@ -52,38 +64,40 @@ class PiFace(object):
         # Set input port
         PiFace.spi.xfer([cmdw, _RA_IODIRB, 0xff])
 
-        # Set input pullups on
-        PiFace.spi.xfer([cmdw, _RA_GPPUB, 0xff])
+        # Set input pullups
+        PiFace.spi.xfer([cmdw, _RA_GPPUB, pull_ups])
 
         # Read initial state of outputs
-        self.outdata = PiFace.spi.xfer([cmdr, _RA_GPIOA, 0])[2]
+        self.out_data = PiFace.spi.xfer([cmdr, _RA_GPIOA, 0])[2]
 
         # Read initial state of inputs
         self.read()
 
     def read(self):
         'Read the byte of inputs for PiFace board'
-        self.indata = PiFace.spi.xfer(self.cmdrseq[:])[2] ^ 0xff
-        return self.indata
+        self.in_data = PiFace.spi.xfer(self.cmdrseq[:])[2] ^ self.in_polarity
+        return self.in_data
 
     def read_pin(self, pin):
         'Convenience function to decode a pin value from last read input'
-        return bool(self.indata & (1 << pin))
+        return bool(self.in_data & (1 << pin))
 
     def write(self, data=None):
         'Write the byte of outputs for PiFace board'
         if data is not None:
-            self.outdata = data
+            self.out_data = data
 
-        self.cmdwseq[2] = self.outdata
+        self.cmdwseq[2] = self.out_data ^ self.out_polarity
+
+        # Need to pass a temp list copy because py-spidev clobbers it
         PiFace.spi.xfer(self.cmdwseq[:])
 
     def write_pin(self, pin, data):
         'Convenience function to write a pin value in pending write output'
         if data:
-            self.outdata |= (1 << pin)
+            self.out_data |= (1 << pin)
         else:
-            self.outdata &= ~(1 << pin)
+            self.out_data &= ~(1 << pin)
 
     def __del__(self):
         'PiFace board destructor'
@@ -98,12 +112,12 @@ class PiFace(object):
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
 _piface = None
-def init(boardno=0):
+def init(board=0, pull_ups=0xff, in_polarity=0x00, out_polarity=0xff):
     'piface package compatible init()'
     global _piface
     if _piface:
         del _piface
-    _piface = PiFace(boardno)
+    _piface = PiFace(board, pull_ups, in_polarity, out_polarity)
 
     # piface package explicitly inits outputs to zero so we will too
     _piface.write(0)

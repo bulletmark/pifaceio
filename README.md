@@ -50,9 +50,13 @@ instance at startup with:
 
     pf = pifaceio.PiFace()
 
-Default is first PiFace board (0). Optionally takes argument 0 to 7 for
-up to 8 PiFace board addresses. Create multiple PiFace() instances if
-you want to use multiple boards in parallel.
+Default is first PiFace board (0). Optionally takes an argument 0 to 7
+for up to 8 PiFace board addresses. Create multiple PiFace() instances
+if you want to use multiple boards in parallel.
+
+There are also other (rarely needed) options to disable the input pull
+up resistors, and to invert the input and output bit polarities. See
+pifaceio.py for details.
 
 At each poll time, e.g. every part second, read all the inputs (i.e. the
 single input byte) with:
@@ -83,14 +87,14 @@ application.
 ### EXAMPLES
 
 Simple example to just reflect all PiFace 8 inputs to the 8 outputs
-every 1 sec, on the default first PiFace board:
+every 10 msec, on the default first PiFace board:
 
     import pifaceio, time
     pf = pifaceio.PiFace()
 
     while True:
         pf.write(pf.read())
-        time.sleep(1)
+        time.sleep(.01)
 
 Same example, but do it across 4 PiFace boards:
 
@@ -100,7 +104,7 @@ Same example, but do it across 4 PiFace boards:
     while True:
         for pf in pifaces:
             pf.write(pf.read())
-        time.sleep(1)
+        time.sleep(.01)
 
 Simple example to test if both input pin 0 and 1 are on at same time,
 and then set output pin 7 if true:

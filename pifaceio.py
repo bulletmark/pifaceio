@@ -25,12 +25,13 @@ class PiFace(object):
     spi = None
 
     def __init__(self, board=0, pull_ups=0xff, in_polarity=0x00,
-            out_polarity=0xff):
+            out_polarity=0xff, change_only=True):
         '''
         PiFace board constructor.
         board: Piface board number = 0 to 7, default = 0.
         pull_ups: Input pull up mask, default = 0xff for all pull ups on.
         in/out_polarity: Mask of bit states for pin to be considered ON.
+        change_only: Only write outputs when there is a change in data.
 
         Note that PiFace board by default has pullups enabled and the
         inputs, e.g. the 4 pushbuttons, activate ON to ground so that
@@ -48,6 +49,7 @@ class PiFace(object):
         PiFace.count += 1
         self.in_polarity = (~in_polarity) & 0xff
         self.out_polarity = (~out_polarity) & 0xff
+        self.change_only = change_only
 
         # Set up the port data (see MCP23S17 data sheet)
         cmdw = 0x40 | (board << 1)
@@ -69,6 +71,7 @@ class PiFace(object):
 
         # Read initial state of outputs
         self.out_data = PiFace.spi.xfer([cmdr, _RA_GPIOA, 0])[2]
+        self.out_last = self.out_data
 
         # Read initial state of inputs
         self.read()
@@ -86,6 +89,13 @@ class PiFace(object):
         'Write the byte of outputs for PiFace board'
         if data is not None:
             self.out_data = data
+
+        # Don't write outputs unless there is a change
+        if self.change_only:
+            if self.out_last == self.out_data:
+                return
+
+            self.out_last = self.out_data
 
         self.cmdwseq[2] = self.out_data ^ self.out_polarity
 
@@ -112,12 +122,13 @@ class PiFace(object):
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
 _piface = None
-def init(board=0, pull_ups=0xff, in_polarity=0x00, out_polarity=0xff):
+def init(board=0, pull_ups=0xff, in_polarity=0x00, out_polarity=0xff,
+        change_only=True):
     'piface package compatible init()'
     global _piface
     if _piface:
         del _piface
-    _piface = PiFace(board, pull_ups, in_polarity, out_polarity)
+    _piface = PiFace(board, pull_ups, in_polarity, out_polarity, change_only)
 
     # piface package explicitly inits outputs to zero so we will too
     _piface.write(0)

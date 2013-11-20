@@ -122,6 +122,30 @@ and then set output pin 7 if true:
     # Do final (actual) write when all output pin states are set.
     pf.write()
 
+Simulated "interrupt" processing example by light-weight poll every 10 msecs:
+
+    import pifaceio, time
+    pf = pifaceio.PiFace()
+
+    def process_change():
+        'On any changed inputs, read inputs and write outputs'
+        pf.write_pin(7, pf.read_pin(0) and pf.read_pin(1))
+
+        # .. etc .. do logic using pf.read_pin() and pf.write_pin()
+
+    # Loop forever polling inputs ..
+    last = None
+    while True:
+        data = pf.read()
+
+        # Do processing only on change
+        if last != data:
+            last = data
+            process_change()
+            pf.write()        # note write() only writes if output changes
+
+        time.sleep(.01)
+
 ### PIFACE PACKAGE BACKWARDS COMPATIBILITY
 
 The following [piface][] API will work compatibly, but performance is

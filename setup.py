@@ -3,8 +3,8 @@ from setuptools import setup
 setup(
     name = 'pifaceio',
     py_modules = ['pifaceio'],
-    version = '1.06',
-    description = 'Simple python interface for the Raspberry Pi PiFace board',
+    version = '1.07',
+    description = 'Simple Python interface to the Raspberry Pi PiFace board',
     long_description = open('README.md').read(),
     keywords = ['piface', 'spidev', 'raspberrypi'],
     classifiers = [],

@@ -1,23 +1,23 @@
 ### PIFACEIO
 
-This package provides a python interface to the [PiFace][pifaceboard]
+This package provides a Python interface to the [PiFace][pifaceboard]
 peripheral board for the [Raspberry Pi][rpi]. A PiFace board offers 8
-digital inputs and 8 digital outputs. This package allows a python
+digital inputs and 8 digital outputs. This package allows a Python
 program to read the inputs and write the outputs on the board via the
 Raspberry Pi SPI bus.
 
 Multiple PiFace boards are supported. This pifaceio package is focussed
 on simplicity and performance for polled implementations and is an
 alternative to the [pifacedigitalio][] and [piface][] (now depreciated)
-python packages for the PiFace board.
+Python packages for the PiFace board.
 
 Interrupts are not supported. See [pifacedigitalio][] for interrupt and
 other functionality.
 
-The pifaceio package requires the [py-spidev][spidev] python package for
+The pifaceio package requires the [py-spidev][spidev] Python package for
 interfacing to the linux spidev device. Note that although the pifaceio
-code is compatible with both python 2 and 3, py-spidev unfortunately is
-currently only compatible with python 2.
+code is compatible with both Python 2 and 3, py-spidev unfortunately is
+currently only compatible with Python 2.
 
 ### INSTALLATION
 
@@ -75,9 +75,9 @@ single output byte) with:
 
     pf.write() # optionally, takes an output byte to write directly
 
-Note that `read_pin()` is just a convenience function wrapping a bit
+Note that `read_pin()` is just a convenience method wrapping a bit
 test around the previously read input byte from `read()` and
-`write_pin()` is just a convenience function wrapping a bit set/clear
+`write_pin()` is just a convenience method wrapping a bit set/clear
 around the output byte pending it being written by `write()`. You don't
 have to use `read_pin()` or `write_pin()` if you just want to read,
 test/manipulate, and write the 8 bit input and/or output byte directly.

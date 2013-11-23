@@ -14,16 +14,15 @@ Python packages for the PiFace board.
 Interrupts are not supported. See [pifacedigitalio][] for interrupt and
 other functionality.
 
-The pifaceio package requires the [py-spidev][spidev] Python package for
-interfacing to the linux spidev device. Note that although the pifaceio
-code is compatible with both Python 2 and 3, py-spidev unfortunately is
-currently only compatible with Python 2.
+The pifaceio package is implemented in pure Python code using only the
+Python standard library, uses no external 3rd party packages, and is
+compatible with both Python versions 2 and 3.
 
 ### INSTALLATION
 
 Install necessary packages on your Raspberry Pi for build etc:
 
-    sudo apt-get install git python-setuptools python-dev
+    sudo apt-get install git python-setuptools
 
 Get this package:
 
@@ -184,7 +183,6 @@ Public License at <http://www.gnu.org/licenses/> for more details.
 [pifaceboard]: http://pi.cs.man.ac.uk/interface.htm
 [piface]: http://github.com/thomasmacpherson/piface
 [pifacedigitalio]: http://github.com/piface/pifacedigitalio
-[spidev]: http://github.com/doceme/py-spidev
 [pypi]: https://pypi.python.org/pypi
 [pip]: http://www.pip-installer.org/en/latest
 [pifaceio]: https://pypi.python.org/pypi/pifaceio

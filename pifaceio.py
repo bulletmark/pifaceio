@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 '''
-This package provides a Python interface to the PiFace peripheral board
-for the Raspberry Pi. This package allows a Python program to read the
-inputs and write the outputs on the board via the Raspberry Pi SPI bus.
-Multiple PiFace boards are supported.
+This package provides a pure Python interface to the PiFace peripheral
+board for the Raspberry Pi. This package allows a Python program to read
+the inputs and write the outputs on the board via the Raspberry Pi SPI
+bus. Multiple PiFace boards are supported.
 '''
 # (C) Mark Blakeney, blakeney.mark@gmail.com, 2013.
 
-# Use 3rd party py-spidev package from github/PyPi
-import spidev
+import struct, ctypes
+from fcntl import ioctl
 
 # MCP23S17 Register addresses we are interested in. See MCP23S17 data sheet.
 _RA_IODIRA =  0 # I/O direction A
@@ -18,6 +18,42 @@ _RA_GPPUA  = 12 # Port A pullups
 _RA_GPPUB  = 13 # Port B pullups
 _RA_GPIOA  = 18 # Port A pins (output)
 _RA_GPIOB  = 19 # Port B pins (input)
+
+class SPIdev(object):
+    'Class to package write and read transfers to spi device'
+    def __init__(self):
+        'Constructor'
+        self.fp = open('/dev/spidev0.0', 'r+b', buffering=0)
+        self.fn = self.fp.fileno()
+
+    def write(self, tx):
+        'Write given transfer "tx" to device'
+        ioctl(self.fn, 0x40206b00, tx[0])
+
+        # Return last (3rd) byte result from read buffer
+        return struct.unpack_from('B', tx[2].raw, 2)[0]
+
+    def rewrite(self, data, tx):
+        'Repack a transfer "tx" with given 3 byte data and write to device'
+        tx[1].raw = struct.pack('3B', *data)
+        return self.write(tx)
+
+    def create_write(self, data):
+        'Create a transfer from given 3 byte data and write to device'
+        return self.write(SPIdev.create(data))
+
+    def __del__(self):
+        'Destructor'
+        self.fp.close()
+
+    @staticmethod
+    def create(data):
+        'Create a transfer from given 3 byte list data'
+        wbuf = ctypes.create_string_buffer(struct.pack('3B', *data))
+        rbuf = ctypes.create_string_buffer(3)
+        sptr = struct.pack('QQLLHBBL', ctypes.addressof(wbuf),
+                ctypes.addressof(rbuf), 3, 0, 0, 8, 0, 0)
+        return ctypes.create_string_buffer(sptr), wbuf, rbuf
 
 class PiFace(object):
     'Allocate an instance of this class for each single PiFace board'
@@ -40,10 +76,9 @@ class PiFace(object):
         # There can only be up to 8 MCP23S17 devices on SPI bus
         assert board in range(8), 'Board number must be 0 to 7'
 
-        # Open spi device only once on first board
+        # Open spi device only once on first board allocated
         if PiFace.count == 0:
-            PiFace.spi = spidev.SpiDev()
-            PiFace.spi.open(0, 0)
+            PiFace.spi = SPIdev()
 
         PiFace.count += 1
         self.read_polarity = (~read_polarity) & 0xff
@@ -52,23 +87,27 @@ class PiFace(object):
         # Set up the port data (see MCP23S17 data sheet)
         cmdw = 0x40 | (board << 1)
         cmdr = cmdw | 1
+
+        # Create write and read transfers, for performance optimisation
         self.cmdwseq = [cmdw, _RA_GPIOA, 0]
-        self.cmdrseq = [cmdr, _RA_GPIOB, 0]
+        self.cmdwtx = SPIdev.create(self.cmdwseq)
+        self.cmdrtx = SPIdev.create([cmdr, _RA_GPIOB, 0])
 
         # Enable hardware addressing
-        PiFace.spi.xfer([cmdw, _RA_IOCON, 8])
+        PiFace.spi.create_write([cmdw, _RA_IOCON, 8])
 
         # Set output port
-        PiFace.spi.xfer([cmdw, _RA_IODIRA, 0])
+        PiFace.spi.create_write([cmdw, _RA_IODIRA, 0])
 
         # Set input port
-        PiFace.spi.xfer([cmdw, _RA_IODIRB, 0xff])
+        PiFace.spi.create_write([cmdw, _RA_IODIRB, 0xff])
 
         # Set input pullups
-        PiFace.spi.xfer([cmdw, _RA_GPPUB, pull_ups])
+        PiFace.spi.create_write([cmdw, _RA_GPPUB, pull_ups])
 
         # Read initial state of outputs
-        self.write_data = PiFace.spi.xfer([cmdr, _RA_GPIOA, 0])[2]
+        self.write_data = PiFace.spi.create_write([cmdr, _RA_GPIOA, 0]) ^ \
+                self.write_polarity
         self.write_last = self.write_data
 
         # Read initial state of inputs
@@ -76,8 +115,7 @@ class PiFace(object):
 
     def read(self):
         'Read and return the byte of inputs for PiFace board'
-        self.read_data = PiFace.spi.xfer(self.cmdrseq[:])[2] ^ \
-                self.read_polarity
+        self.read_data = PiFace.spi.write(self.cmdrtx) ^ self.read_polarity
         return self.read_data
 
     def read_pin(self, pin):
@@ -87,7 +125,7 @@ class PiFace(object):
     def write(self, data=None):
         'Write the byte of outputs for PiFace board'
         if data is not None:
-            self.write_data = data
+            self.write_data = data & 0xff
 
         # Don't write outputs unless there is a change
         if self.write_last == self.write_data:
@@ -95,9 +133,7 @@ class PiFace(object):
 
         self.write_last = self.write_data
         self.cmdwseq[2] = self.write_data ^ self.write_polarity
-
-        # Need to pass a temp list copy because py-spidev clobbers it
-        PiFace.spi.xfer(self.cmdwseq[:])
+        PiFace.spi.rewrite(self.cmdwseq, self.cmdwtx)
 
     def write_pin(self, pin, data):
         'Convenience function to write a pin value in pending write output'
@@ -112,9 +148,7 @@ class PiFace(object):
 
         # Close spi device if this is the last board we had open
         if PiFace.count == 0:
-            PiFace.spi.close()
             del PiFace.spi
-            PiFace.spi = None
 
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.

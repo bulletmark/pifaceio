@@ -7,8 +7,7 @@ bus. Multiple PiFace boards are supported.
 '''
 # (C) Mark Blakeney, blakeney.mark@gmail.com, 2013.
 
-import struct, ctypes
-from fcntl import ioctl
+import struct, ctypes, fcntl
 
 # MCP23S17 Register addresses we are interested in. See MCP23S17 data sheet.
 _RA_IODIRA =  0 # I/O direction A
@@ -19,8 +18,8 @@ _RA_GPPUB  = 13 # Port B pullups
 _RA_GPIOA  = 18 # Port A pins (output)
 _RA_GPIOB  = 19 # Port B pins (input)
 
-class SPIdev(object):
-    'Class to package write and read transfers to spi device'
+class _SPIdev(object):
+    'Internal class to package write and read transfers to spi device'
     def __init__(self):
         'Constructor'
         self.fp = open('/dev/spidev0.0', 'r+b', buffering=0)
@@ -28,7 +27,7 @@ class SPIdev(object):
 
     def write(self, tx):
         'Write given transfer "tx" to device'
-        ioctl(self.fn, 0x40206b00, tx[0])
+        fcntl.ioctl(self.fn, 0x40206b00, tx[0])
 
         # Return last (3rd) byte result from read buffer
         return struct.unpack_from('B', tx[2].raw, 2)[0]
@@ -40,7 +39,7 @@ class SPIdev(object):
 
     def create_write(self, data):
         'Create a transfer from given 3 byte data and write to device'
-        return self.write(SPIdev.create(data))
+        return self.write(_SPIdev.create(data))
 
     def __del__(self):
         'Destructor'
@@ -52,7 +51,7 @@ class SPIdev(object):
         wbuf = ctypes.create_string_buffer(struct.pack('3B', *data))
         rbuf = ctypes.create_string_buffer(3)
         sptr = struct.pack('QQLLHBBL', ctypes.addressof(wbuf),
-                ctypes.addressof(rbuf), 3, 0, 0, 8, 0, 0)
+                ctypes.addressof(rbuf), 3, 0, 0, 0, 0, 0)
         return ctypes.create_string_buffer(sptr), wbuf, rbuf
 
 class PiFace(object):
@@ -78,7 +77,7 @@ class PiFace(object):
 
         # Open spi device only once on first board allocated
         if PiFace.count == 0:
-            PiFace.spi = SPIdev()
+            PiFace.spi = _SPIdev()
 
         PiFace.count += 1
         self.read_polarity = (~read_polarity) & 0xff
@@ -90,8 +89,8 @@ class PiFace(object):
 
         # Create write and read transfers, for performance optimisation
         self.cmdwseq = [cmdw, _RA_GPIOA, 0]
-        self.cmdwtx = SPIdev.create(self.cmdwseq)
-        self.cmdrtx = SPIdev.create([cmdr, _RA_GPIOB, 0])
+        self.cmdwtx = _SPIdev.create(self.cmdwseq)
+        self.cmdrtx = _SPIdev.create([cmdr, _RA_GPIOB, 0])
 
         # Enable hardware addressing
         PiFace.spi.create_write([cmdw, _RA_IOCON, 8])

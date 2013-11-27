@@ -57,7 +57,6 @@ class _SPIdev(object):
 class PiFace(object):
     'Allocate an instance of this class for each single PiFace board'
     count = 0
-    spi = None
 
     def __init__(self, board=0, pull_ups=0xff, read_polarity=0x00,
             write_polarity=0xff):

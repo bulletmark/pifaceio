@@ -101,7 +101,7 @@ class PiFace(object):
         PiFace.spi.create_write([cmdw, _RA_IODIRB, 0xff])
 
         # Set input pullups
-        PiFace.spi.create_write([cmdw, _RA_GPPUB, pull_ups])
+        PiFace.spi.create_write([cmdw, _RA_GPPUB, pull_ups & 0xff])
 
         # Read initial state of outputs
         self.write_data = PiFace.spi.create_write([cmdr, _RA_GPIOA, 0]) ^ \

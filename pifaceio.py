@@ -59,12 +59,13 @@ class PiFace(object):
     count = 0
 
     def __init__(self, board=0, pull_ups=0xff, read_polarity=0x00,
-            write_polarity=0xff):
+            write_polarity=0xff, init=True):
         '''
         PiFace board constructor.
         board: Piface board number = 0 to 7, default = 0.
         pull_ups: Input pull up mask, default = 0xff for all pull ups on.
         read/write_polarity: Mask of bit states for pin to be considered ON.
+        init: Set False to inhibit board initialisaion. Default is True.
 
         Note that PiFace board by default has pullups enabled and the
         inputs, e.g. the 4 pushbuttons, activate ON to ground so that
@@ -87,58 +88,69 @@ class PiFace(object):
         cmdr = cmdw | 1
 
         # Create write and read transfers, for performance optimisation
-        self.cmdwseq = [cmdw, _RA_GPIOA, 0]
-        self.cmdwtx = _SPIdev.create(self.cmdwseq)
-        self.cmdrtx = _SPIdev.create([cmdr, _RA_GPIOB, 0])
+        self.write_cmd = [cmdw, _RA_GPIOA, 0]
+        self.write_tx = _SPIdev.create(self.write_cmd)
+        self.read_tx = _SPIdev.create([cmdr, _RA_GPIOB, 0])
+        self.out_tx = _SPIdev.create([cmdr, _RA_GPIOA, 0])
 
-        # Enable hardware addressing
-        PiFace.spi.create_write([cmdw, _RA_IOCON, 8])
+        # Initialise board, if not inhibited to do so
+        if init:
 
-        # Set output port
-        PiFace.spi.create_write([cmdw, _RA_IODIRA, 0])
+            # Enable hardware addressing
+            PiFace.spi.create_write([cmdw, _RA_IOCON, 8])
 
-        # Set input port
-        PiFace.spi.create_write([cmdw, _RA_IODIRB, 0xff])
+            # Set output port
+            PiFace.spi.create_write([cmdw, _RA_IODIRA, 0])
 
-        # Set input pullups
-        PiFace.spi.create_write([cmdw, _RA_GPPUB, pull_ups & 0xff])
+            # Set input port
+            PiFace.spi.create_write([cmdw, _RA_IODIRB, 0xff])
+
+            # Set input pullups
+            PiFace.spi.create_write([cmdw, _RA_GPPUB, pull_ups & 0xff])
 
         # Read initial state of outputs
-        self.write_data = PiFace.spi.create_write([cmdr, _RA_GPIOA, 0]) ^ \
-                self.write_polarity
-        self.write_last = self.write_data
+        self.outputs = self.read_outputs()
 
         # Read initial state of inputs
         self.read()
 
     def read(self):
-        'Read and return the byte of inputs for PiFace board'
-        self.read_data = PiFace.spi.write(self.cmdrtx) ^ self.read_polarity
-        return self.read_data
+        'Read and return the byte of inputs on the PiFace board'
+        self.inputs = PiFace.spi.write(self.read_tx) ^ self.read_polarity
+        return self.inputs
 
     def read_pin(self, pin):
         'Convenience function to decode a pin value from last read input'
-        return bool(self.read_data & (1 << pin))
+        return bool(self.inputs & (1 << pin))
 
     def write(self, data=None):
-        'Write the byte of outputs for PiFace board'
+        'Write the byte of outputs on the PiFace board'
         if data is not None:
-            self.write_data = data & 0xff
+            self.outputs = data & 0xff
 
         # Don't write outputs unless there is a change
-        if self.write_last == self.write_data:
+        if self.outputs_last == self.outputs:
             return
 
-        self.write_last = self.write_data
-        self.cmdwseq[2] = self.write_data ^ self.write_polarity
-        PiFace.spi.rewrite(self.cmdwseq, self.cmdwtx)
+        self.outputs_last = self.outputs
+        self.write_cmd[2] = self.outputs ^ self.write_polarity
+        PiFace.spi.rewrite(self.write_cmd, self.write_tx)
 
     def write_pin(self, pin, data):
         'Convenience function to write a pin value in pending write output'
         if data:
-            self.write_data |= (1 << pin)
+            self.outputs |= (1 << pin)
         else:
-            self.write_data &= ~(1 << pin)
+            self.outputs &= ~(1 << pin)
+
+    def read_outputs(self):
+        'Read and return the byte of outputs on the PiFace board'
+        self.outputs_last = PiFace.spi.write(self.out_tx) ^ self.write_polarity
+        return self.outputs_last
+
+    def read_outputs_pin(self, pin):
+        'Convenience function to decode a pin value from last read output'
+        return bool(self.outputs_last & (1 << pin))
 
     def __del__(self):
         'PiFace board destructor'
@@ -151,12 +163,13 @@ class PiFace(object):
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
 _piface = None
-def init(board=0, pull_ups=0xff, read_polarity=0x00, write_polarity=0xff):
+def init(board=0, pull_ups=0xff, read_polarity=0x00, write_polarity=0xff,
+        init_=True):
     'piface package compatible init()'
     global _piface
     if _piface:
         del _piface
-    _piface = PiFace(board, pull_ups, read_polarity, write_polarity)
+    _piface = PiFace(board, pull_ups, read_polarity, write_polarity, init_)
 
     # piface package explicitly inits outputs to zero so we will too
     _piface.write(0)

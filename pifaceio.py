@@ -18,11 +18,11 @@ _RA_GPPUB  = 13 # Port B pullups
 _RA_GPIOA  = 18 # Port A pins (output)
 _RA_GPIOB  = 19 # Port B pins (input)
 
-class _SPIdev(object):
-    'Internal class to package write and read transfers to spi device'
-    def __init__(self):
+class SPIdev(object):
+    'Class to package 3 byte write + read transfers to spi device'
+    def __init__(self, devname):
         'Constructor'
-        self.fp = open('/dev/spidev0.0', 'r+b', buffering=0)
+        self.fp = open(devname, 'r+b', buffering=0)
         self.fn = self.fp.fileno()
 
     def write(self, tx):
@@ -39,7 +39,7 @@ class _SPIdev(object):
 
     def create_write(self, data):
         'Create a transfer from given 3 byte data and write to device'
-        return self.write(_SPIdev.create(data))
+        return self.write(SPIdev.create(data))
 
     def __del__(self):
         'Destructor'
@@ -77,7 +77,7 @@ class PiFace(object):
 
         # Open spi device only once on first board allocated
         if PiFace.count == 0:
-            PiFace.spi = _SPIdev()
+            PiFace.spi = SPIdev('/dev/spidev0.0')
 
         PiFace.count += 1
         self.read_polarity = (~read_polarity) & 0xff
@@ -89,9 +89,9 @@ class PiFace(object):
 
         # Create write and read transfers, for performance optimisation
         self.write_cmd = [cmdw, _RA_GPIOA, 0]
-        self.write_tx = _SPIdev.create(self.write_cmd)
-        self.read_tx = _SPIdev.create([cmdr, _RA_GPIOB, 0])
-        self.out_tx = _SPIdev.create([cmdr, _RA_GPIOA, 0])
+        self.write_tx = SPIdev.create(self.write_cmd)
+        self.read_tx = SPIdev.create([cmdr, _RA_GPIOB, 0])
+        self.out_tx = SPIdev.create([cmdr, _RA_GPIOA, 0])
 
         # Initialise board, if not inhibited to do so
         if init:

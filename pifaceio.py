@@ -43,7 +43,8 @@ class SPIdev(object):
 
     def __del__(self):
         'Destructor'
-        self.fp.close()
+        if hasattr(self, 'fp'):
+            self.fp.close()
 
     @staticmethod
     def create(data):

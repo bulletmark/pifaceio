@@ -155,11 +155,12 @@ class PiFace(object):
 
     def __del__(self):
         'PiFace board destructor'
-        PiFace.count -= 1
+        if hasattr(PiFace, 'count'):
+            PiFace.count -= 1
 
-        # Close spi device if this is the last board we had open
-        if PiFace.count == 0:
-            del PiFace.spi
+            # Close spi device if this is the last board we had open
+            if PiFace.count == 0:
+                del PiFace.spi
 
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
@@ -196,6 +197,11 @@ def read_output():
     'piface package compatible read_output()'
     assert _piface, 'init() has not been called'
     return _piface.read_outputs()
+
+def read_output_last():
+    'Return last written (cached) output byte value'
+    assert _piface, 'init() has not been called'
+    return _piface.outputs_last
 
 def write_output(data):
     'piface package compatible write_output()'

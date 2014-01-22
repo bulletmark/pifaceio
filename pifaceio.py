@@ -41,10 +41,9 @@ class SPIdev(object):
         'Create a transfer from given 3 byte data and write to device'
         return self.write(SPIdev.create(data))
 
-    def __del__(self):
-        'Destructor'
-        if hasattr(self, 'fp'):
-            self.fp.close()
+    def close(self):
+        'Close this instance'
+        self.fp.close()
 
     @staticmethod
     def create(data):
@@ -153,14 +152,13 @@ class PiFace(object):
         'Convenience function to decode a pin value from last read output'
         return bool(self.outputs_last & (1 << pin))
 
-    def __del__(self):
-        'PiFace board destructor'
-        if hasattr(PiFace, 'count'):
-            PiFace.count -= 1
+    def close(self):
+        'Close this PiFace board'
+        PiFace.count -= 1
 
-            # Close spi device if this is the last board we had open
-            if PiFace.count == 0:
-                del PiFace.spi
+        # Close spi device if this is the last board we had open
+        if PiFace.count == 0:
+            PiFace.spi.close()
 
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
@@ -170,7 +168,8 @@ def init(board=0, pull_ups=0xff, read_polarity=0x00, write_polarity=0xff,
     'piface package compatible init()'
     global _piface
     if _piface:
-        del _piface
+        _piface.close()
+        _piface = None
     _piface = PiFace(board, pull_ups, read_polarity, write_polarity, init_ports)
 
     # piface package explicitly inits outputs to zero so we will too
@@ -213,5 +212,5 @@ def deinit():
     'piface package compatible deinit()'
     global _piface
     if _piface:
-        del _piface
+        _piface.close()
         _piface = None

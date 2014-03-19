@@ -171,11 +171,12 @@ def deinit():
         _piface.close()
         _piface = None
 
-def init(board=0, pull_ups=0xff, read_polarity=0x00, write_polarity=0xff,
-        init_ports=True):
+# Takes same arguments as PiFace() constructor, see PiFace.__init__() above
+def init(*args, **kwargs):
     'piface package compatible init()'
+    global _piface
     deinit()
-    _piface = PiFace(board, pull_ups, read_polarity, write_polarity, init_ports)
+    _piface = PiFace(*args, **kwargs)
 
     # piface package explicitly inits outputs to zero so we will too
     _piface.write(0)

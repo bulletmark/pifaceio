@@ -163,13 +163,18 @@ class PiFace(object):
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
 _piface = None
-def init(board=0, pull_ups=0xff, read_polarity=0x00, write_polarity=0xff,
-        init_ports=True):
-    'piface package compatible init()'
+
+def deinit():
+    'piface package compatible deinit()'
     global _piface
     if _piface:
         _piface.close()
         _piface = None
+
+def init(board=0, pull_ups=0xff, read_polarity=0x00, write_polarity=0xff,
+        init_ports=True):
+    'piface package compatible init()'
+    deinit()
     _piface = PiFace(board, pull_ups, read_polarity, write_polarity, init_ports)
 
     # piface package explicitly inits outputs to zero so we will too
@@ -207,10 +212,3 @@ def write_output(data):
     assert _piface, 'init() has not been called'
     _piface.write(data)
     return _piface.outputs_last
-
-def deinit():
-    'piface package compatible deinit()'
-    global _piface
-    if _piface:
-        _piface.close()
-        _piface = None

@@ -180,7 +180,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
 Public License at <http://www.gnu.org/licenses/> for more details.
 
 [rpi]: http://www.raspberrypi.org
-[pifaceboard]: http://pi.cs.man.ac.uk/interface.htm
+[pifaceboard]: http://www.piface.org.uk/products/piface_digital/
 [piface]: http://github.com/thomasmacpherson/piface
 [pifacedigitalio]: http://github.com/piface/pifacedigitalio
 [pypi]: https://pypi.python.org/pypi

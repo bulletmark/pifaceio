@@ -59,13 +59,13 @@ class PiFace(object):
     count = 0
 
     def __init__(self, board=0, pull_ups=0xff, read_polarity=0x00,
-            write_polarity=0xff, init=True):
+            write_polarity=0xff, init_board=True):
         '''
         PiFace board constructor.
         board: Piface board number = 0 to 7, default = 0.
         pull_ups: Input pull up mask, default = 0xff for all pull ups on.
         read/write_polarity: Mask of bit states for pin to be considered ON.
-        init: Set False to inhibit board initialisaion. Default is True.
+        init_board: Set False to inhibit board initialisaion. Default is True.
 
         Note that PiFace board by default has pullups enabled and the
         inputs, e.g. the 4 pushbuttons, activate ON to ground so that
@@ -94,7 +94,7 @@ class PiFace(object):
         self.out_tx = SPIdev.create([cmdr, _RA_GPIOA, 0])
 
         # Initialise board, if not inhibited to do so
-        if init:
+        if init_board:
 
             # Enable hardware addressing
             PiFace.spi.create_write([cmdw, _RA_IOCON, 8])
@@ -172,14 +172,15 @@ def deinit():
         _piface = None
 
 # Takes same arguments as PiFace() constructor, see PiFace.__init__() above
-def init(*args, **kwargs):
+def init(init_board=True, *args, **kwargs):
     'piface package compatible init()'
     global _piface
     deinit()
-    _piface = PiFace(*args, **kwargs)
+    _piface = PiFace(init_board=init_board, *args, **kwargs)
 
     # piface package explicitly inits outputs to zero so we will too
-    _piface.write(0)
+    if (init_board):
+        _piface.write(0)
 
 def digital_read(pin):
     'piface package compatible digital_read()'

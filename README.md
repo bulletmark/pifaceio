@@ -161,6 +161,12 @@ output bytes using the canonical new pifaceio API described above.
     pf.digital_write(pin, value)
     pf.deinit()
 
+You can also use multiple boards with this compatibility interface, e.g.
+as follows where board can be from 0 to 7.
+
+    value = pf.digital_read(pin, board)
+    pf.digital_write(pin, value, board)
+
 ### UPGRADE
 
     cd pifaceio  # source dir, as above

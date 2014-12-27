@@ -162,55 +162,64 @@ class PiFace(object):
 
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
-_piface = None
+_pifaces = None
 
 def deinit():
     'piface package compatible deinit()'
-    global _piface
-    if _piface:
-        _piface.close()
-        _piface = None
+    global _pifaces
+    if _pifaces:
+        for pf in _pifaces:
+            pf.close()
+
+        _pifaces = None
 
 # Takes same arguments as PiFace() constructor, see PiFace.__init__() above
 def init(init_board=True, *args, **kwargs):
     'piface package compatible init()'
-    global _piface
+    global _pifaces
     deinit()
-    _piface = PiFace(init_board=init_board, *args, **kwargs)
+    _pifaces = [PiFace(b, init_board=init_board, *args, **kwargs) \
+            for b in range(8)]
 
     # piface package explicitly inits outputs to zero so we will too
-    if (init_board):
-        _piface.write(0)
+    if init_board:
+        for pf in _pifaces:
+            pf.write(0)
 
-def digital_read(pin):
+def _get_board(board):
+    'Internal service function to return PiFace board instance'
+    assert board in range(8), 'Board number must be 0 to 7'
+    if not _pifaces:
+        init()
+
+    return _pifaces[board]
+
+def digital_read(pin, board=0):
     'piface package compatible digital_read()'
-    assert _piface, 'init() has not been called'
-    _piface.read()
-    return _piface.read_pin(pin)
+    pf = _get_board(board)
+    pf.read()
+    return pf.read_pin(pin)
 
-def digital_write(pin, data):
+def digital_write(pin, data, board=0):
     'piface package compatible digital_write()'
-    assert _piface, 'init() has not been called'
-    _piface.write_pin(pin, data)
-    _piface.write()
+    pf = _get_board(board)
+    pf.write_pin(pin, data)
+    pf.write()
 
-def read_input():
+def read_input(board=0):
     'piface package compatible read_input()'
-    assert _piface, 'init() has not been called'
-    return _piface.read()
+    return _get_board(board).read()
 
-def read_output():
+def read_output(board=0):
     'piface package compatible read_output()'
-    assert _piface, 'init() has not been called'
-    return _piface.read_outputs()
+    return _get_board(board).read_outputs()
 
-def read_output_last():
+def read_output_last(board=0):
     'Return last written (cached) output byte value'
-    assert _piface, 'init() has not been called'
-    return _piface.outputs_last
+    return _get_board(board).outputs_last
 
-def write_output(data):
+def write_output(data, board=0):
     'piface package compatible write_output()'
-    assert _piface, 'init() has not been called'
-    _piface.write(data)
-    return _piface.outputs_last
+    pf = _get_board(board)
+    pf.write(data)
+    return pf.outputs_last

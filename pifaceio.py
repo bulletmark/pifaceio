@@ -24,6 +24,7 @@ class SPIdev(object):
         'Constructor'
         self.fp = open(devname, 'r+b', buffering=0)
         self.fn = self.fp.fileno()
+        self.count = 0
 
     def write(self, tx):
         'Write given transfer "tx" to device'
@@ -56,30 +57,36 @@ class SPIdev(object):
 
 class PiFace(object):
     'Allocate an instance of this class for each single PiFace board'
-    count = 0
+    spi = {}
 
     def __init__(self, board=0, pull_ups=0xff, read_polarity=0x00,
-            write_polarity=0xff, init_board=True):
+            write_polarity=0xff, init_board=True, bus=0, chip=0):
         '''
         PiFace board constructor.
         board: Piface board number = 0 to 7, default = 0.
         pull_ups: Input pull up mask, default = 0xff for all pull ups on.
         read/write_polarity: Mask of bit states for pin to be considered ON.
         init_board: Set False to inhibit board initialisaion. Default is True.
+        bus: SPI bus = 0 or 1, default = 0.
+        chip: SPI chip select = 0 or 1, default = 0
 
-        Note that PiFace board by default has pullups enabled and the
-        inputs, e.g. the 4 pushbuttons, activate ON to ground so that
-        is why the default read_polarity is 0x00. I.e. 0 bit state is "ON".
+        Note that bus 0, chip 0 corresponds to /dev/spidev0.0, etc.
+
+        The PiFace board by default has pullups enabled and the inputs,
+        e.g. the 4 pushbuttons, activate ON to ground so that is why the
+        default read_polarity is 0x00. I.e. 0 bit state is "ON".
         '''
 
         # There can only be up to 8 MCP23S17 devices on SPI bus
         assert board in range(8), 'Board number must be 0 to 7'
 
         # Open spi device only once on first board allocated
-        if PiFace.count == 0:
-            PiFace.spi = SPIdev('/dev/spidev0.0')
+        self.busaddr = (bus, chip)
+        if self.busaddr not in PiFace.spi:
+            PiFace.spi[self.busaddr] = SPIdev('/dev/spidev%d.%d' % self.busaddr)
 
-        PiFace.count += 1
+        self.spi = PiFace.spi[self.busaddr]
+        self.spi.count += 1
         self.read_polarity = (~read_polarity) & 0xff
         self.write_polarity = (~write_polarity) & 0xff
 
@@ -97,16 +104,16 @@ class PiFace(object):
         if init_board:
 
             # Enable hardware addressing
-            PiFace.spi.create_write([cmdw, _RA_IOCON, 8])
+            self.spi.create_write([cmdw, _RA_IOCON, 8])
 
             # Set output port
-            PiFace.spi.create_write([cmdw, _RA_IODIRA, 0])
+            self.spi.create_write([cmdw, _RA_IODIRA, 0])
 
             # Set input port
-            PiFace.spi.create_write([cmdw, _RA_IODIRB, 0xff])
+            self.spi.create_write([cmdw, _RA_IODIRB, 0xff])
 
             # Set input pullups
-            PiFace.spi.create_write([cmdw, _RA_GPPUB, pull_ups & 0xff])
+            self.spi.create_write([cmdw, _RA_GPPUB, pull_ups & 0xff])
 
         # Read initial state of outputs
         self.outputs = self.read_outputs()
@@ -116,7 +123,7 @@ class PiFace(object):
 
     def read(self):
         'Read and return the byte of inputs on the PiFace board'
-        self.inputs = PiFace.spi.write(self.read_tx) ^ self.read_polarity
+        self.inputs = self.spi.write(self.read_tx) ^ self.read_polarity
         return self.inputs
 
     def read_pin(self, pin):
@@ -134,7 +141,7 @@ class PiFace(object):
 
         self.outputs_last = self.outputs
         self.write_cmd[2] = self.outputs ^ self.write_polarity
-        PiFace.spi.rewrite(self.write_cmd, self.write_tx)
+        self.spi.rewrite(self.write_cmd, self.write_tx)
 
     def write_pin(self, pin, data):
         'Convenience function to write a pin value in pending write output'
@@ -145,7 +152,7 @@ class PiFace(object):
 
     def read_outputs(self):
         'Read and return the byte of outputs on the PiFace board'
-        self.outputs_last = PiFace.spi.write(self.out_tx) ^ self.write_polarity
+        self.outputs_last = self.spi.write(self.out_tx) ^ self.write_polarity
         return self.outputs_last
 
     def read_outputs_pin(self, pin):
@@ -154,11 +161,12 @@ class PiFace(object):
 
     def close(self):
         'Close this PiFace board'
-        PiFace.count -= 1
+        self.spi.count -= 1
 
         # Close spi device if this is the last board we had open
-        if PiFace.count == 0:
-            PiFace.spi.close()
+        if self.spi.count == 0:
+            self.spi.close()
+            del PiFace.spi[self.busaddr]
 
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.

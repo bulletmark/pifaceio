@@ -43,12 +43,24 @@ if [ $REMOVE -eq 0 ]; then
     echo "Removing blacklist for spi-bcm2708 .."
     sed -i "/^blacklist *spi-bcm2708/s/^/#/" \
 	/etc/modprobe.d/raspi-blacklist.conf
-    modprobe spi-bcm2708
+    if ! grep -q "^dtparam=spi=on" /boot/config.txt; then
+	echo "Adding SPI to device tree"
+	echo "dtparam=spi=on" >>/boot/config.txt
+    else
+	echo "SPI already added to device tree"
+    fi
+    modprobe spi-bcm2708 2>/dev/null
 else
     echo "Restoring blacklist for spi-bcm2708 .."
     sed -i "/^#blacklist *spi-bcm2708/s/^#//" \
 	/etc/modprobe.d/raspi-blacklist.conf
     modprobe -r spi-bcm2708
+    if grep -q "^dtparam=spi=on" /boot/config.txt; then
+	echo "Removing SPI from device tree"
+	sed -i "/^dtparam=spi=on$/d" /boot/config.txt
+    else
+	echo "SPI already removed from device tree"
+    fi
     echo
     echo "Removing udev spi rules file .."
     rm -f /etc/udev/rules.d/50-spi.rules

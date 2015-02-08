@@ -32,6 +32,7 @@ if [ "$(id -un)" != "root" ]; then
     exit 1
 fi
 
+NEED_REBOOT=0
 if [ $REMOVE -eq 0 ]; then
     echo "Adding $USER to spi group .."
     groupadd spi
@@ -46,6 +47,7 @@ if [ $REMOVE -eq 0 ]; then
     if ! grep -q "^dtparam=spi=on" /boot/config.txt; then
 	echo "Adding SPI to device tree"
 	echo "dtparam=spi=on" >>/boot/config.txt
+	NEED_REBOOT=1
     else
 	echo "SPI already added to device tree"
     fi
@@ -58,6 +60,7 @@ else
     if grep -q "^dtparam=spi=on" /boot/config.txt; then
 	echo "Removing SPI from device tree"
 	sed -i "/^dtparam=spi=on$/d" /boot/config.txt
+	NEED_REBOOT=1
     else
 	echo "SPI already removed from device tree"
     fi
@@ -74,5 +77,9 @@ echo
 echo "Reloading udev rules .."
 udevadm control --reload-rules
 echo
-echo "User $USER must log out and back in again"
+if [ $NEED_REBOOT -ne 0 ]; then
+    echo "You need to reboot this host."
+else
+    echo "User $USER must log out and back in again."
+fi
 exit 0

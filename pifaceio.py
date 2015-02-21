@@ -18,7 +18,7 @@ _RA_GPPUB  = 13 # Port B pullups
 _RA_GPIOA  = 18 # Port A pins (output)
 _RA_GPIOB  = 19 # Port B pins (input)
 
-class SPIdev(object):
+class _SPIdev(object):
     'Class to package 3 byte write + read transfers to spi device'
     def __init__(self, devname):
         'Constructor'
@@ -40,7 +40,7 @@ class SPIdev(object):
 
     def create_write(self, data):
         'Create a transfer from given 3 byte data and write to device'
-        return self.write(SPIdev.create(data))
+        return self.write(_SPIdev.create(data))
 
     def close(self):
         'Close this instance'
@@ -57,7 +57,7 @@ class SPIdev(object):
 
 class PiFace(object):
     'Allocate an instance of this class for each single PiFace board'
-    spi = {}
+    _spi = {}
 
     def __init__(self, board=0, pull_ups=0xff, read_polarity=0x00,
             write_polarity=0xff, init_board=True, bus=0, chip=0):
@@ -82,10 +82,11 @@ class PiFace(object):
 
         # Open spi device only once on first board allocated
         self.busaddr = (bus, chip)
-        if self.busaddr not in PiFace.spi:
-            PiFace.spi[self.busaddr] = SPIdev('/dev/spidev%d.%d' % self.busaddr)
+        if self.busaddr not in PiFace._spi:
+            PiFace._spi[self.busaddr] = \
+                    _SPIdev('/dev/spidev%d.%d' % self.busaddr)
 
-        self.spi = PiFace.spi[self.busaddr]
+        self.spi = PiFace._spi[self.busaddr]
         self.spi.count += 1
         self.read_polarity = (~read_polarity) & 0xff
         self.write_polarity = (~write_polarity) & 0xff
@@ -96,9 +97,9 @@ class PiFace(object):
 
         # Create write and read transfers, for performance optimisation
         self.write_cmd = [cmdw, _RA_GPIOA, 0]
-        self.write_tx = SPIdev.create(self.write_cmd)
-        self.read_tx = SPIdev.create([cmdr, _RA_GPIOB, 0])
-        self.out_tx = SPIdev.create([cmdr, _RA_GPIOA, 0])
+        self.write_tx = _SPIdev.create(self.write_cmd)
+        self.read_tx = _SPIdev.create([cmdr, _RA_GPIOB, 0])
+        self.out_tx = _SPIdev.create([cmdr, _RA_GPIOA, 0])
 
         # Initialise board, if not inhibited to do so
         if init_board:

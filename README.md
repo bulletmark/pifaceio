@@ -17,7 +17,9 @@ other functionality.
 
 The pifaceio package is implemented in pure Python code using only the
 Python standard library, uses no external 3rd party packages, and is
-compatible with both Python versions 2 and 3.
+compatible with both Python versions 2 and 3. In my simple benchmark
+polled read and write tests, pifaceio performs significantly faster and
+with much less overhead than pifacedigitalio.
 
 ### INSTALLATION
 
@@ -39,7 +41,8 @@ Set up permissions, groups, udev etc for spidev device on RPi:
     sudo ./install-spidev.sh
 
 Note that the [pifaceio pypi package][pifaceio] is also available from
-[PyPi][pypi] so alternatively you can install it using [pip][].
+[PyPi][pypi] so alternatively you can install it using [pip][] (with or
+without a [virtualenv][]).
 
 ### USAGE
 
@@ -192,6 +195,7 @@ Public License at <http://www.gnu.org/licenses/> for more details.
 [pifacedigitalio]: http://github.com/piface/pifacedigitalio
 [pypi]: https://pypi.python.org/pypi
 [pip]: http://www.pip-installer.org/en/latest
+[virtualenv]: https://virtualenv.pypa.io/en/latest
 [pifaceio]: https://pypi.python.org/pypi/pifaceio
 
 <!-- vim: se ai et syn=markdown: -->

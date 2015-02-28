@@ -1,25 +1,26 @@
 ### PIFACEIO
 
-This package provides a Python interface to the [PiFace
-Digital][pifaceboard] peripheral I/O board for the [Raspberry Pi][rpi].
+This package provides a Python interface to the [PiFace Digital][pifaceboard]
+peripheral I/O board for the [Raspberry Pi][rpi].
 A [PiFace Digital][pifaceboard] board offers 8 digital inputs and 8
 digital outputs. This package allows a Python program to read the inputs
 and write the outputs on the board via the Raspberry Pi SPI bus.
 
-Multiple [PiFace Digital][pifaceboard] boards are supported.
-This pifaceio package is focussed on simplicity and performance for
-polled implementations and is an alternative to the [pifacedigitalio][]
-and [piface][] (now depreciated) Python packages for the [PiFace
-Digital][pifaceboard] board.
+Multiple [PiFace Digital][pifaceboard] boards are supported, on either
+or both of the RPi SPI bus chip selects. This pifaceio package is
+focussed on simplicity and performance for polled implementations and is
+an alternative to the [pifacedigitalio][] and [piface][] (now
+depreciated) Python packages for the [PiFace Digital][pifaceboard]
+board. In my simple polled read and write benchmarks, pifaceio performs
+significantly faster and with much less overhead than
+[pifacedigitalio][].
 
 Interrupts are not supported. See [pifacedigitalio][] for interrupt and
 other functionality.
 
 The pifaceio package is implemented in pure Python code using only the
 Python standard library, uses no external 3rd party packages, and is
-compatible with both Python versions 2 and 3. In my simple benchmark
-polled read and write tests, pifaceio performs significantly faster and
-with much less overhead than pifacedigitalio.
+compatible with Python versions 2 and 3.
 
 ### INSTALLATION
 

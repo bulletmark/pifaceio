@@ -6,6 +6,9 @@ A [PiFace Digital][pifaceboard] board offers 8 digital inputs and 8
 digital outputs. This package allows a Python program to read the inputs
 and write the outputs on the board via the Raspberry Pi SPI bus.
 
+The newer [PiFace Digital 2][pifaceboard2] board is exactly compatible
+with the original board and so is also supported by this package.
+
 Multiple [PiFace Digital][pifaceboard] boards are supported, on either
 or both of the RPi SPI bus chip selects. This pifaceio package is
 focussed on simplicity and performance for polled implementations and is
@@ -192,6 +195,7 @@ Public License at <http://www.gnu.org/licenses/> for more details.
 
 [rpi]: http://www.raspberrypi.org
 [pifaceboard]: http://www.piface.org.uk/products/piface_digital/
+[pifaceboard2]: http://www.element14.com/community/docs/DOC-69001/l/piface-digital-2-for-raspberry-pi
 [piface]: http://github.com/thomasmacpherson/piface
 [pifacedigitalio]: http://github.com/piface/pifacedigitalio
 [pypi]: https://pypi.python.org/pypi

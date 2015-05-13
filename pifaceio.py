@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 '''
-This package provides a pure Python interface to the PiFace peripheral
-board for the Raspberry Pi. This package allows a Python program to read
-the inputs and write the outputs on the board via the Raspberry Pi SPI
-bus. Multiple PiFace boards are supported.
+This package provides a pure Python interface to the PiFace Digital
+peripheral board for the Raspberry Pi. This package allows a Python
+program to read the inputs and write the outputs on the board via the
+Raspberry Pi SPI bus. Multiple PiFace boards are supported. The newer
+PiFace Digital 2 board is exactly compatible with the original board and
+so is also supported by this package.
 '''
 # (C) Mark Blakeney, blakeney.mark@gmail.com, 2013.
 

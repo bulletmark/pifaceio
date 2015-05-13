@@ -3,6 +3,9 @@
 # (C) Mark Blakeney, blakeney.mark@gmail.com, 2013.
 
 USER="${SUDO_USER:-pi}"
+BLFILE="/etc/modprobe.d/raspi-blacklist.conf"
+BOFILE="/boot/config.txt"
+RLFILE="/etc/udev/rules.d/50-spi.rules"
 
 usage() {
     echo "Usage: $(basename $0) [-options]"
@@ -39,34 +42,40 @@ if [ $REMOVE -eq 0 ]; then
     gpasswd -a $USER spi
     echo
     echo "Creating udev spi rules file .."
-    echo "$SPIRULE" >/etc/udev/rules.d/50-spi.rules
+    echo "$SPIRULE" >$RLFILE
     echo
-    echo "Removing blacklist for spi-bcm2708 .."
-    sed -i "/^blacklist *spi-bcm2708/s/^/#/" \
-	/etc/modprobe.d/raspi-blacklist.conf
-    if ! grep -q "^dtparam=spi=on" /boot/config.txt; then
-	echo "Adding SPI to device tree"
-	echo "dtparam=spi=on" >>/boot/config.txt
-	NEED_REBOOT=1
-    else
-	echo "SPI already added to device tree"
+    if [ -f $BLFILE ]; then
+	echo "Removing blacklist for spi-bcm2708 .."
+	sed -i "/^blacklist *spi-bcm2708/s/^/#/" $BFILE
+    fi
+    if [ -f $BOFILE ]; then
+	if ! grep -q "^dtparam=spi=on" $BOFILE; then
+	    echo "Adding SPI to device tree"
+	    echo "dtparam=spi=on" >>$BOFILE
+	    NEED_REBOOT=1
+	else
+	    echo "SPI already added to device tree"
+	fi
     fi
     modprobe spi-bcm2708 2>/dev/null
 else
-    echo "Restoring blacklist for spi-bcm2708 .."
-    sed -i "/^#blacklist *spi-bcm2708/s/^#//" \
-	/etc/modprobe.d/raspi-blacklist.conf
+    if [ -f $BLFILE ]; then
+	echo "Restoring blacklist for spi-bcm2708 .."
+	sed -i "/^#blacklist *spi-bcm2708/s/^#//" $BLFILE
+    fi
     modprobe -r spi-bcm2708
-    if grep -q "^dtparam=spi=on" /boot/config.txt; then
-	echo "Removing SPI from device tree"
-	sed -i "/^dtparam=spi=on$/d" /boot/config.txt
-	NEED_REBOOT=1
-    else
-	echo "SPI already removed from device tree"
+    if [ -f $BOFILE ]; then
+	if grep -q "^dtparam=spi=on" $BOFILE; then
+	    echo "Removing SPI from device tree"
+	    sed -i "/^dtparam=spi=on$/d" $BOFILE
+	    NEED_REBOOT=1
+	else
+	    echo "SPI already removed from device tree"
+	fi
     fi
     echo
     echo "Removing udev spi rules file .."
-    rm -f /etc/udev/rules.d/50-spi.rules
+    rm -f $RLFILE
     echo
     echo "Removing $USER from spi group .."
     gpasswd -d $USER spi

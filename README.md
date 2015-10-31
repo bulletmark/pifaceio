@@ -40,7 +40,8 @@ of course):
 
     sudo python ./setup.py install
 
-Set up permissions, groups, udev etc for spidev device on RPi:
+To set up permissions/groups/udev etc for spidev device on RPi, run the
+following included script and then reboot.
 
     sudo ./install-spidev.sh
 

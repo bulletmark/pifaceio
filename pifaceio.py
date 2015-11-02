@@ -171,6 +171,9 @@ class PiFace(object):
             self.spi.close()
             del PiFace.spi[self.busaddr]
 
+# Provide non-camelcase class name alias
+piface = PiFace
+
 # Compatibility functions just for old piface package emulation.
 # Not intended to be comprehensive. Really just a demonstration.
 _pifaces = None

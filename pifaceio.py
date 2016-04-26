@@ -169,7 +169,7 @@ class PiFace(object):
         # Close spi device if this is the last board we had open
         if self.spi.count == 0:
             self.spi.close()
-            del PiFace.spi[self.busaddr]
+            del PiFace._spi[self.busaddr]
 
 # Provide non-camelcase class name alias
 piface = PiFace

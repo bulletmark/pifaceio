@@ -12,13 +12,13 @@ so is also supported by this package.
 import struct, ctypes, fcntl
 
 # MCP23S17 Register addresses we are interested in. See MCP23S17 data sheet.
-_RA_IODIRA =  0 # I/O direction A
-_RA_IODIRB =  1 # I/O direction B
-_RA_IOCON  = 10 # I/O config
-_RA_GPPUA  = 12 # Port A pullups
-_RA_GPPUB  = 13 # Port B pullups
-_RA_GPIOA  = 18 # Port A pins (output)
-_RA_GPIOB  = 19 # Port B pins (input)
+_RA_IODIRA = 0  # I/O direction A
+_RA_IODIRB = 1  # I/O direction B
+_RA_IOCON = 10  # I/O config
+_RA_GPPUA = 12  # Port A pullups
+_RA_GPPUB = 13  # Port B pullups
+_RA_GPIOA = 18  # Port A pins (output)
+_RA_GPIOB = 19  # Port B pins (input)
 
 class _SPIdev(object):
     'Class to package 3 byte write + read transfers to spi device'
@@ -192,7 +192,7 @@ def init(init_board=True, *args, **kwargs):
     'piface package compatible init()'
     global _pifaces
     deinit()
-    _pifaces = [PiFace(b, init_board=init_board, *args, **kwargs) \
+    _pifaces = [PiFace(b, init_board=init_board, *args, **kwargs)
             for b in range(8)]
 
     # piface package explicitly inits outputs to zero so we will too

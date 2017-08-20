@@ -237,3 +237,7 @@ def write_output(data, board=0):
     pf = _get_board(board)
     pf.write(data)
     return pf.outputs_last
+
+if __name__ == '__main__':
+    pf = PiFace()
+    print(pf.read())

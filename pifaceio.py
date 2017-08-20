@@ -22,11 +22,13 @@ _RA_GPIOB = 19  # Port B pins (input)
 
 class _SPIdev(object):
     'Class to package 3 byte write + read transfers to spi device'
-    def __init__(self, devname):
+    def __init__(self, devname, speed):
         'Constructor'
         self.fp = open(devname, 'r+b', buffering=0)
         self.fn = self.fp.fileno()
         self.count = 0
+        # Set the max speed
+        fcntl.ioctl(self.fn, 0x40046B04, struct.pack('L', speed))
 
     def write(self, tx):
         'Write given transfer "tx" to device'
@@ -62,7 +64,8 @@ class PiFace(object):
     _spi = {}
 
     def __init__(self, board=0, pull_ups=0xff, read_polarity=0x00,
-            write_polarity=0xff, init_board=True, bus=0, chip=0):
+            write_polarity=0xff, init_board=True, bus=0, chip=0,
+            speed=int(10e6)):
         '''
         PiFace board constructor.
         board: Piface board number = 0 to 7, default = 0.
@@ -71,6 +74,7 @@ class PiFace(object):
         init_board: Set False to inhibit board initialisaion. Default is True.
         bus: SPI bus = 0 or 1, default = 0.
         chip: SPI chip select = 0 or 1, default = 0
+        speed: in Hz. Default is MCP23S17 max speed of 10MHz.
 
         Note that bus 0, chip 0 corresponds to /dev/spidev0.0, etc.
 
@@ -86,7 +90,7 @@ class PiFace(object):
         self.busaddr = (bus, chip)
         if self.busaddr not in PiFace._spi:
             PiFace._spi[self.busaddr] = \
-                    _SPIdev('/dev/spidev%d.%d' % self.busaddr)
+                    _SPIdev('/dev/spidev%d.%d' % self.busaddr, speed)
 
         self.spi = PiFace._spi[self.busaddr]
         self.spi.count += 1

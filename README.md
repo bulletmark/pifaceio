@@ -158,7 +158,9 @@ Simulated "interrupt" processing example by light-weight poll every 10 msecs:
 
 The following [piface][] API will work compatibly, but performance is
 slightly degraded compared to reading and writing the single input and
-output bytes using the canonical new pifaceio API described above.
+output bytes using the canonical new and preferred pifaceio API
+described above. However, performance is still significantly
+superior compared to using the original [piface][] package itself.
 
     #import piface.pfio as pf (change this to next line)
     import pifaceio as pf

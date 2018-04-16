@@ -29,29 +29,21 @@ compatible with Python versions 2 and 3.
 
 Install necessary packages on your Raspberry Pi for build etc:
 
-```shell
     sudo apt-get install git python-setuptools
-```
 
 Get this package:
 
-```shell
     git clone http://github.com/bulletmark/pifaceio
-```
 
 Install (can alternately do this as ordinary user in a virtualenv
 of course):
 
-```shell
     sudo python ./setup.py install
-```
 
 To set up permissions/groups/udev etc for spidev device on RPi, run the
 following included script and then reboot.
 
-```shell
     sudo ./install-spidev.sh
-```
 
 Note that the [pifaceio pypi package][pifaceio] is also available from
 [PyPi][pypi] so alternatively you can install it using [pip][] (with or
@@ -64,9 +56,7 @@ Board addresses, input pins, and output pins are always numbered from 0.
 In general, you start with a once-off allocation of a PiFace board
 instance at startup with:
 
-```python
     pf = pifaceio.PiFace()
-```
 
 Default is first PiFace board (0). Optionally takes an argument 0 to 7
 for up to 8 PiFace board addresses. Create multiple PiFace() instances
@@ -79,25 +69,19 @@ pifaceio.py for details.
 At each poll time, e.g. every part second, read all the inputs (i.e. the
 single input byte) with:
 
-```python
     pf.read() # returns the input byte you can use directly if you prefer
-```
 
 Then read and write individual pins according to your logic with:
 
-```python
     in_val = pf.read_pin(pin_in)
     ..
     pf.write_pin(pin_out, out_val)
     ..
-```
 
 Finally, write all the outputs at the end of processing (i.e. write the
 single output byte) with:
 
-```python
     pf.write() # optionally, takes an output byte to write directly
-```
 
 Note that `read_pin()` is just a convenience method wrapping a bit
 test around the previously read input byte from `read()` and
@@ -113,18 +97,15 @@ application.
 Simple example to just reflect all PiFace 8 inputs to the 8 outputs
 every 10 msec, on the default first PiFace board:
 
-```python
     import pifaceio, time
     pf = pifaceio.PiFace()
 
     while True:
         pf.write(pf.read())
         time.sleep(.01)
-```
 
 Same example, but do it across 4 PiFace boards:
 
-```python
     import pifaceio, time
     pifaces = [pifaceio.PiFace(n) for n in range(4)]
 
@@ -132,12 +113,10 @@ Same example, but do it across 4 PiFace boards:
         for pf in pifaces:
             pf.write(pf.read())
         time.sleep(.01)
-```
 
 Simple example to test if both input pin 0 and 1 are on at same time,
 and then set output pin 7 if true:
 
-```python
     import pifaceio
     pf = pifaceio.PiFace()
     ...
@@ -150,11 +129,9 @@ and then set output pin 7 if true:
 
     # Do final (actual) write when all output pin states are set.
     pf.write()
-```
 
 Simulated "interrupt" processing example by light-weight poll every 10 msecs:
 
-```python
     import pifaceio, time
     pf = pifaceio.PiFace()
 
@@ -176,7 +153,6 @@ Simulated "interrupt" processing example by light-weight poll every 10 msecs:
             pf.write()        # note write() only writes if output changes
 
         time.sleep(.01)
-```
 
 ### PIFACE PACKAGE BACKWARDS COMPATIBILITY
 
@@ -186,7 +162,6 @@ output bytes using the canonical new and preferred pifaceio API
 described above. However, performance is still significantly
 superior compared to using the original [piface][] package itself.
 
-```python
     #import piface.pfio as pf (change this to next line)
     import pifaceio as pf
 
@@ -195,23 +170,18 @@ superior compared to using the original [piface][] package itself.
     value = pf.digital_read(pin)
     pf.digital_write(pin, value)
     pf.deinit()
-```
 
 You can also use multiple boards with this compatibility interface, e.g.
 as follows where board can be from 0 to 7.
 
-```python
     value = pf.digital_read(pin, board)
     pf.digital_write(pin, value, board)
-```
 
 ### UPGRADE
 
-```shell
     cd pifaceio  # source dir, as above
     git pull
     sudo python ./setup.py install
-```
 
 ### LICENSE
 

@@ -34,6 +34,9 @@ uninstall:
 	    $(DESTDIR)/usr/lib/python*/site-packages/*$(NAME)* \
 	    $(DESTDIR)/usr/lib/python*/site-packages/*/*$(NAME)*
 
+sdist:
+	python setup.py sdist
+
 upload: sdist
 	twine upload dist/*
 

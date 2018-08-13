@@ -27,6 +27,25 @@ compatible with Python versions 2 and 3.
 
 ### INSTALLATION
 
+#### Installation using PIP
+
+The [pifaceio pypi package][pifaceio] is available from [PyPi][] so
+you can install it using [pip][] (with or without a [virtualenv][]). If
+[pip][] is not already installed run:
+
+    sudo apt-get install python-pip
+
+Then use pip to install the [pifaceio][] package:
+
+    sudo pip install pifaceio
+
+To set up permissions/groups/udev etc for spidev device on RPi, run the
+included script and then reboot.
+
+    sudo install-spidev.sh
+
+#### Alternative Installation from Github
+
 Install necessary packages on your Raspberry Pi for build etc:
 
     sudo apt-get install git python-setuptools
@@ -35,7 +54,7 @@ Get this package:
 
     git clone http://github.com/bulletmark/pifaceio
 
-Install (can alternately do this as ordinary user in a virtualenv
+Install (can alternately do this as ordinary user in a [virtualenv][]
 of course):
 
     sudo python ./setup.py install
@@ -44,10 +63,6 @@ To set up permissions/groups/udev etc for spidev device on RPi, run the
 following included script and then reboot.
 
     sudo ./install-spidev.sh
-
-Note that the [pifaceio pypi package][pifaceio] is also available from
-[PyPi][pypi] so alternatively you can install it using [pip][] (with or
-without a [virtualenv][]).
 
 ### USAGE
 
@@ -201,7 +216,7 @@ Public License at <http://www.gnu.org/licenses/> for more details.
 [pifaceboard2]: http://www.element14.com/community/docs/DOC-69001/l/piface-digital-2-for-raspberry-pi
 [piface]: http://github.com/thomasmacpherson/piface
 [pifacedigitalio]: http://github.com/piface/pifacedigitalio
-[pypi]: https://pypi.python.org/pypi
+[PyPi]: https://pypi.python.org/pypi
 [pip]: http://www.pip-installer.org/en/latest
 [virtualenv]: https://virtualenv.pypa.io/en/latest
 [pifaceio]: https://pypi.python.org/pypi/pifaceio

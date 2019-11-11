@@ -13,42 +13,36 @@
 # details.
 
 NAME = pifaceio
-SCRIPT = install-spidev.sh
+SCRIPTS = $(NAME)-install-spidev.sh
 
 DOC = README.md
-
 DOCOUT = $(DOC:.md=.html)
 
-PYTHON = python
-
 all:
-	$(PYTHON) setup.py build
+	@echo "Type sudo make install|uninstall"
+	@echo "or make sdist|upload|doc|check|clean"
 
 install:
-	$(PYTHON) setup.py install --root=$(or $(DESTDIR),/) --optimize=1
+	pip3 install .
 
 uninstall:
-	@rm -vrf $(DESTDIR)/usr/bin/$(NAME)* $(DESTDIR)/etc/$(NAME)* \
-	    $(DESTDIR)/usr/bin/$(SCRIPT) \
-	    $(DESTDIR)/usr/share/doc/$(NAME) \
-	    $(DESTDIR)/usr/lib/python*/site-packages/*$(NAME)* \
-	    $(DESTDIR)/usr/lib/python*/site-packages/*/*$(NAME)*
+	pip3 uninstall $(NAME)
 
 sdist:
-	python setup.py sdist
+	python3 setup.py sdist
 
 upload: sdist
-	twine upload dist/*
+	twine3 upload dist/*
 
 doc:	$(DOCOUT)
-
-check:
-	flake8 $(NAME).py setup.py
-	shellcheck $(SCRIPT)
 
 $(DOCOUT): $(DOC)
 	markdown $< >$@
 
+check:
+	flake8 $(NAME).py setup.py
+	vermin -i -q $(NAME).py setup.py
+	shellcheck $(SCRIPTS)
+
 clean:
-	$(PYTHON) setup.py clean
-	@rm -vrf $(DOCOUT) *.egg-info build/ dist/ __pycache__/ *.pyc __pycache__
+	@rm -vrf $(DOCOUT) *.egg-info build/ dist/ __pycache__/

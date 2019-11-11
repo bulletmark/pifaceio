@@ -42,27 +42,28 @@ Then use pip to install the [pifaceio][] package:
 To set up permissions/groups/udev etc for spidev device on RPi, run the
 included script and then reboot.
 
-    sudo install-spidev.sh
+    sudo pifaceio-install-spidev.sh
 
 #### Alternative Installation from Github
 
 Install necessary packages on your Raspberry Pi for build etc:
 
-    sudo apt-get install git python-setuptools
+    sudo apt-get install git python-pip
 
 Get this package:
 
     git clone http://github.com/bulletmark/pifaceio
+    cd pifaceio
 
 Install (can alternately do this as ordinary user in a [virtualenv][]
 of course):
 
-    sudo python ./setup.py install
+    sudo pip install .
 
 To set up permissions/groups/udev etc for spidev device on RPi, run the
 following included script and then reboot.
 
-    sudo ./install-spidev.sh
+    sudo ./pifaceio-install-spidev.sh
 
 ### USAGE
 
@@ -196,7 +197,7 @@ as follows where board can be from 0 to 7.
 
     cd pifaceio  # source dir, as above
     git pull
-    sudo python ./setup.py install
+    sudo pip install -U .
 
 ### LICENSE
 

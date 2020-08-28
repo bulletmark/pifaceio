@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 This package provides a pure Python interface to the PiFace Digital
 peripheral board for the Raspberry Pi. This package allows a Python
@@ -9,7 +9,9 @@ so is also supported by this package.
 '''
 # (C) Mark Blakeney, blakeney.mark@gmail.com, 2013.
 
-import struct, ctypes, fcntl
+import struct
+import ctypes
+import fcntl
 
 # MCP23S17 Register addresses we are interested in. See MCP23S17 data sheet.
 _RA_IODIRA = 0  # I/O direction A
@@ -20,7 +22,7 @@ _RA_GPPUB = 13  # Port B pullups
 _RA_GPIOA = 18  # Port A pins (output)
 _RA_GPIOB = 19  # Port B pins (input)
 
-class _SPIdev(object):
+class _SPIdev:
     'Class to package 3 byte write + read transfers to spi device'
     def __init__(self, devname, speed):
         'Constructor'
@@ -59,7 +61,7 @@ class _SPIdev(object):
                 ctypes.addressof(rbuf), 3, 0, 0, 0, 0, 0)
         return ctypes.create_string_buffer(sptr), wbuf, rbuf
 
-class PiFace(object):
+class PiFace:
     'Allocate an instance of this class for each single PiFace board'
     _spi = {}
 

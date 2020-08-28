@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # Setup script to install this package.
 # M.Blakeney, Mar 2018.
 
@@ -13,7 +13,7 @@ executable = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
 
 setup(
     name=name,
-    version='1.27',
+    version='1.3',
     description='Python interface to the Raspberry Pi PiFace board',
     long_description=here.joinpath('README.md').read_text(),
     long_description_content_type="text/markdown",

@@ -23,7 +23,7 @@ other functionality.
 
 The pifaceio package is implemented in pure Python code using only the
 Python standard library, uses no external 3rd party packages, and is
-compatible with Python versions 2 and 3.
+compatible with Python version 3.4 and later.
 
 ### INSTALLATION
 

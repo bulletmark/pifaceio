@@ -33,11 +33,11 @@ The [pifaceio pypi package][pifaceio] is available from [PyPi][] so
 you can install it using [pip][] (with or without a [virtualenv][]). If
 [pip][] is not already installed run:
 
-    sudo apt-get install python-pip
+    sudo apt-get install python3-pip
 
 Then use pip to install the [pifaceio][] package:
 
-    sudo pip install pifaceio
+    sudo pip3 install pifaceio
 
 To set up permissions/groups/udev etc for spidev device on RPi, run the
 included script and then reboot.
@@ -48,7 +48,7 @@ included script and then reboot.
 
 Install necessary packages on your Raspberry Pi for build etc:
 
-    sudo apt-get install git python-pip
+    sudo apt-get install git python3-pip
 
 Get this package:
 
@@ -58,7 +58,7 @@ Get this package:
 Install (can alternately do this as ordinary user in a [virtualenv][]
 of course):
 
-    sudo pip install .
+    sudo pip3 install .
 
 To set up permissions/groups/udev etc for spidev device on RPi, run the
 following included script and then reboot.
@@ -197,7 +197,7 @@ as follows where board can be from 0 to 7.
 
     cd pifaceio  # source dir, as above
     git pull
-    sudo pip install -U .
+    sudo pip3 install -U .
 
 ### LICENSE
 

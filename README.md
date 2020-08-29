@@ -27,43 +27,23 @@ compatible with Python version 3.4 and later.
 
 ### INSTALLATION
 
-#### Installation using PIP
-
-The [pifaceio pypi package][pifaceio] is available from [PyPi][] so
-you can install it using [pip][] (with or without a [virtualenv][]). If
-[pip][] is not already installed run:
+The [pifaceio pypi package][pifaceio] is available from [PyPi][] so you
+can install it using [pip][]. If [pip][] is not already installed run:
 
     sudo apt-get install python3-pip
 
 Then use pip to install the [pifaceio][] package:
 
-    sudo pip3 install pifaceio
+    sudo pip3 install -U pifaceio
 
 To set up permissions/groups/udev etc for spidev device on RPi, run the
 included script and then reboot.
 
     sudo pifaceio-install-spidev.sh
 
-#### Alternative Installation from Github
+### UPGRADE
 
-Install necessary packages on your Raspberry Pi for build etc:
-
-    sudo apt-get install git python3-pip
-
-Get this package:
-
-    git clone http://github.com/bulletmark/pifaceio
-    cd pifaceio
-
-Install (can alternately do this as ordinary user in a [virtualenv][]
-of course):
-
-    sudo pip3 install .
-
-To set up permissions/groups/udev etc for spidev device on RPi, run the
-following included script and then reboot.
-
-    sudo ./pifaceio-install-spidev.sh
+    sudo pip3 install -U pifaceio
 
 ### USAGE
 
@@ -175,8 +155,8 @@ Simulated "interrupt" processing example by light-weight poll every 10 msecs:
 The following [piface][] API will work compatibly, but performance is
 slightly degraded compared to reading and writing the single input and
 output bytes using the canonical new and preferred pifaceio API
-described above. However, performance is still significantly
-superior compared to using the original [piface][] package itself.
+described above. However, performance is still significantly superior to
+the original [piface][] package itself.
 
     #import piface.pfio as pf (change this to next line)
     import pifaceio as pf
@@ -192,12 +172,6 @@ as follows where board can be from 0 to 7.
 
     value = pf.digital_read(pin, board)
     pf.digital_write(pin, value, board)
-
-### UPGRADE
-
-    cd pifaceio  # source dir, as above
-    git pull
-    sudo pip3 install -U .
 
 ### LICENSE
 
@@ -219,7 +193,6 @@ Public License at <http://www.gnu.org/licenses/> for more details.
 [pifacedigitalio]: http://github.com/piface/pifacedigitalio
 [PyPi]: https://pypi.python.org/pypi
 [pip]: http://www.pip-installer.org/en/latest
-[virtualenv]: https://virtualenv.pypa.io/en/latest
 [pifaceio]: https://pypi.python.org/pypi/pifaceio
 
 <!-- vim: se ai et syn=markdown: -->

@@ -33,10 +33,12 @@ repository. It produces the following sample of simple polled read and
 write performance comparisons between [pifacedigitalio][] and
 [pifaceio][] on a Raspberry Pi2B.
 
-|Function                 |`pifacedigitalio`|`pifaceio` |Speedup
-|-------------------------|-----------------|-----------|--------
-|Input reads per second   |1725             |16434      |x 9.5
-|Output writes per second |876              |11700      |x 13.4
+|Function                              |`pifacedigitalio`|`pifaceio` |Speedup
+|--------------------------------------|-----------------|-----------|--------
+|Input reads per second                |1740             |16317      |x 9.4
+|Output writes per second              |884              |11590      |x 13.1
+|Input reads per second (classic API)  |1773             |11128      |x 6.3
+|Output reads per second (classic API) |889              |9140       |x 10.3
 
 ### INSTALLATION
 

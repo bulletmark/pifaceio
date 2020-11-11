@@ -3,11 +3,23 @@
 # Author: Mark Blakeney, Nov 2020.
 
 import time
+import pifaceio
+import pifacedigitalio
 
 COUNT = 1000
 
+def report(test, val1, val2):
+    'Output test results comparison'
+    ps1 = round(COUNT / val1, 1)
+    ps2 = round(COUNT / val2, 1)
+    mult = round(ps1 / ps2, 1)
+
+    print()
+    print('pifacedigitalio did {} {} per second.'.format(ps2, test))
+    print('pifaceio did {} {} per second.'.format(ps1, test))
+    print('pifaceio {} is {} times faster.'.format(test, mult))
+
 # Execute pifaceio tests ..
-import pifaceio  # noqa: E402
 pf = pifaceio.PiFace()
 
 start = time.monotonic()
@@ -25,8 +37,27 @@ for c in range(COUNT):
 
 write1 = time.monotonic() - start
 
+pf.close()
+pifaceio.init()
+
+start = time.monotonic()
+for c in range(COUNT):
+    pifaceio.digital_read(0)
+
+readc1 = time.monotonic() - start
+
+start = time.monotonic()
+for c in range(COUNT):
+    if c % 2:
+        pifaceio.digital_write(7, 1)
+    else:
+        pifaceio.digital_write(7, 0)
+
+writec1 = time.monotonic() - start
+
+pifaceio.deinit()
+
 # Execute pifacedigitalio tests ..
-import pifacedigitalio  # noqa: E402
 pf = pifacedigitalio.PiFaceDigital()
 
 start = time.monotonic()
@@ -44,19 +75,27 @@ for c in range(COUNT):
 
 write2 = time.monotonic() - start
 
-# Output results ..
-ps1 = round(COUNT / read1, 1)
-ps2 = round(COUNT / read2, 1)
-mult = round(ps1 / ps2, 1)
+pf.deinit_board()
+pifacedigitalio.init()
 
-print(f'pifaceio did {ps1} input reads per second.')
-print(f'pifacedigitalio did {ps2} input reads per second.')
-print(f'pifaceio input read is {mult} times faster.')
+start = time.monotonic()
+for c in range(COUNT):
+    pifacedigitalio.digital_read(0)
 
-ps1 = round(COUNT / write1, 1)
-ps2 = round(COUNT / write2, 1)
-mult = round(ps1 / ps2, 1)
+readc2 = time.monotonic() - start
 
-print(f'pifaceio did {ps1} output writes per second.')
-print(f'pifacedigitalio did {ps2} output writes per second.')
-print(f'pifaceio output write is {mult} times faster.')
+start = time.monotonic()
+for c in range(COUNT):
+    if c % 2:
+        pifacedigitalio.digital_write(7, 1)
+    else:
+        pifacedigitalio.digital_write(7, 0)
+
+writec2 = time.monotonic() - start
+
+pifacedigitalio.deinit()
+
+report('input reads', read1, read2)
+report('output writes', write1, write2)
+report('classic API input reads', readc1, readc2)
+report('classic API output reads', writec1, writec2)

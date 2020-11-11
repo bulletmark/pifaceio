@@ -28,7 +28,7 @@ compatible with Python version 3.4 and later.
 
 #### Performance Benchmarks Against pifacedigitalio
 
-A small [`benchmarks`](benchmarks) program is included in the
+A small [`benchmark`](benchmark) program is included in the
 repository. It produces the following sample of simple polled read and
 write performance comparisons between [pifacedigitalio][] and
 [pifaceio][] on a Raspberry Pi2B.

@@ -173,7 +173,9 @@ classic API will work compatibly, but performance is slightly degraded
 compared to reading and writing the single input and output bytes using
 the canonical new and preferred pifaceio API described above. However,
 performance is still significantly superior to the original
-[pifacedigitalio][] and [piface][] packages.
+[pifacedigitalio][] and [piface][] packages as shown in the above
+[performance
+comparison](#performance-benchmarks-against-pifacedigitalio) section.
 
     #import piface.pfio as pf (change this line ..)
     #import pifacedigitalio as pf (or this line .., to the following line)

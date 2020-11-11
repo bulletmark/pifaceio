@@ -12,10 +12,11 @@ with the original board and so is also supported by this package.
 Multiple [PiFace Digital][pifaceboard] boards are supported, on either
 or both of the RPi SPI bus chip selects. This pifaceio package is
 focussed on simplicity and performance for polled implementations and is
-an alternative to the [pifacedigitalio][] and [piface][] (now
-depreciated) Python packages for the [PiFace Digital][pifaceboard]
-board. In my simple polled read and write benchmarks, pifaceio performs
-significantly faster and with much less overhead than
+an alternative to the official [pifacedigitalio][] Python package for
+the [PiFace Digital][pifaceboard] board. In my simple benchmark of
+polled reads and writes ([see next
+section](#performance-benchmarks-against-pifacedigitalio)), pifaceio
+performs an order of magnitude faster, and with much less overhead than
 [pifacedigitalio][].
 
 Interrupts are not supported. See [pifacedigitalio][] for interrupt and
@@ -24,6 +25,18 @@ other functionality.
 The pifaceio package is implemented in pure Python code using only the
 Python standard library, uses no external 3rd party packages, and is
 compatible with Python version 3.4 and later.
+
+#### Performance Benchmarks Against pifacedigitalio
+
+A small [`benchmarks`](benchmarks) program is included in the
+repository. It produces the following sample of simple polled read and
+write performance comparisons between [pifacedigitalio][] and
+[pifaceio][] on a Raspberry Pi2B.
+
+|Function                 |`pifacedigitalio`|`pifaceio` |Speedup
+|-------------------------|-----------------|-----------|--------
+|Input reads per second   |1725             |16434      |x 9.5
+|Output writes per second |876              |11700      |x 13.4
 
 ### INSTALLATION
 
@@ -152,11 +165,13 @@ Simulated "interrupt" processing example by light-weight poll every 10 msecs:
 
 ### PIFACE PACKAGE BACKWARDS COMPATIBILITY
 
-The following [piface][] API will work compatibly, but performance is
-slightly degraded compared to reading and writing the single input and
-output bytes using the canonical new and preferred pifaceio API
-described above. However, performance is still significantly superior to
-the original [piface][] package itself.
+As an alternative API, pifaceio also implements the "classic" API from
+the [pifacedigitalio][] and it's predecessor [piface][] packages. The
+classic API will work compatibly, but performance is slightly degraded
+compared to reading and writing the single input and output bytes using
+the canonical new and preferred pifaceio API described above. However,
+performance is still significantly superior to the original
+[pifacedigitalio][] and [piface][] packages.
 
     #import piface.pfio as pf (change this to next line)
     import pifaceio as pf

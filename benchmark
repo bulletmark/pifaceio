@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+'Simple benchmark for pifaceio against pifacedigitalio.'
+# Author: Mark Blakeney, Nov 2020.
+
+import time
+
+COUNT = 1000
+
+# Execute pifaceio tests ..
+import pifaceio  # noqa: E402
+pf = pifaceio.PiFace()
+
+start = time.monotonic()
+for c in range(COUNT):
+    pf.read()
+
+read1 = time.monotonic() - start
+
+start = time.monotonic()
+for c in range(COUNT):
+    if c % 2:
+        pf.write(0x80)
+    else:
+        pf.write(0)
+
+write1 = time.monotonic() - start
+
+# Execute pifacedigitalio tests ..
+import pifacedigitalio  # noqa: E402
+pf = pifacedigitalio.PiFaceDigital()
+
+start = time.monotonic()
+for c in range(COUNT):
+    pf.input_port.value
+
+read2 = time.monotonic() - start
+
+start = time.monotonic()
+for c in range(COUNT):
+    if c % 2:
+        pf.leds[7].turn_on()
+    else:
+        pf.leds[7].turn_off()
+
+write2 = time.monotonic() - start
+
+# Output results ..
+ps1 = round(COUNT / read1, 1)
+ps2 = round(COUNT / read2, 1)
+mult = round(ps1 / ps2, 1)
+
+print(f'pifaceio did {ps1} input reads per second.')
+print(f'pifacedigitalio did {ps2} input reads per second.')
+print(f'pifaceio input read is {mult} times faster.')
+
+ps1 = round(COUNT / write1, 1)
+ps2 = round(COUNT / write2, 1)
+mult = round(ps1 / ps2, 1)
+
+print(f'pifaceio did {ps1} output writes per second.')
+print(f'pifacedigitalio did {ps2} output writes per second.')
+print(f'pifaceio output write is {mult} times faster.')

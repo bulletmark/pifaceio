@@ -40,8 +40,8 @@ $(DOCOUT): $(DOC)
 	markdown $< >$@
 
 check:
-	flake8 $(NAME).py setup.py
-	vermin -i -q $(NAME).py setup.py
+	flake8 $(NAME).py setup.py benchmark
+	vermin -i -q $(NAME).py setup.py benchmark
 	shellcheck $(SCRIPTS)
 
 clean:

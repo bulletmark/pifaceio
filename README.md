@@ -173,7 +173,8 @@ the canonical new and preferred pifaceio API described above. However,
 performance is still significantly superior to the original
 [pifacedigitalio][] and [piface][] packages.
 
-    #import piface.pfio as pf (change this to next line)
+    #import piface.pfio as pf (change this line ..)
+    #import pifacedigitalio as pf (or this line .., to the following line)
     import pifaceio as pf
 
     # The following calls should be approximately compatible:

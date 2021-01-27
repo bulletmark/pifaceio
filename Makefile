@@ -44,6 +44,7 @@ check:
 	flake8 $(NAME).py setup.py benchmark
 	vermin -i -q $(NAME).py setup.py benchmark
 	shellcheck $(SCRIPTS)
+	python setup.py check
 
 clean:
 	@rm -vrf $(DOCOUT) *.egg-info build/ dist/ __pycache__/

@@ -2,14 +2,12 @@
 # Setup script to install this package.
 # M.Blakeney, Mar 2018.
 
-import stat
 from pathlib import Path
 from setuptools import setup
 
 name = 'pifaceio'
 module = name.replace('-', '_')
 here = Path(__file__).resolve().parent
-executable = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
 
 setup(
     name=name,

@@ -1,4 +1,5 @@
 ### PIFACEIO
+[![PyPi](https://img.shields.io/pypi/v/pifaceio)](https://pypi.org/project/pifaceio/)
 
 This package provides a Python interface to the [PiFace Digital][pifaceboard]
 peripheral I/O board for the [Raspberry Pi][rpi].

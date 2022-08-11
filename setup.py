@@ -11,22 +11,22 @@ here = Path(__file__).resolve().parent
 
 setup(
     name=name,
-    version='1.34',
+    version='1.35',
     description='Python interface to the Raspberry Pi PiFace board',
     long_description=here.joinpath('README.md').read_text(),
     long_description_content_type="text/markdown",
-    url='http://github.com/bulletmark/{}'.format(name),
+    url=f'http://github.com/bulletmark/{name}',
     author='Mark Blakeney',
     author_email='mark.blakeney@bullet-systems.net',
     keywords=['piface', 'pifacedigitalio', 'spidev', 'raspberrypi'],
     license='GPLv3',
     py_modules=[module],
-    python_requires='>=3.4',
+    python_requires='>=3.6',
     classifiers=[
         'Programming Language :: Python :: 3',
     ],
     data_files=[
-        ('share/{}'.format(name), ['README.md']),
+        (f'share/{name}', ['README.md']),
     ],
-    scripts=['{}-install-spidev.sh'.format(name)]
+    scripts=[f'{name}-install-spidev.sh']
 )

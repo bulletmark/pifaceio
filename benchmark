@@ -15,9 +15,9 @@ def report(test, val1, val2):
     mult = round(ps1 / ps2, 1)
 
     print()
-    print('pifacedigitalio did {} {} per second.'.format(ps2, test))
-    print('pifaceio did {} {} per second.'.format(ps1, test))
-    print('pifaceio {} is {} times faster.'.format(test, mult))
+    print(f'pifacedigitalio did {ps2} {test} per second.')
+    print(f'pifaceio did {ps1} {test} per second.')
+    print(f'pifaceio {test} is {mult} times faster.')
 
 # Execute pifaceio tests ..
 pf = pifaceio.PiFace()

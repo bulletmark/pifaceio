@@ -92,7 +92,7 @@ class PiFace:
         self.busaddr = (bus, chip)
         if self.busaddr not in PiFace._spi:
             PiFace._spi[self.busaddr] = \
-                    _SPIdev('/dev/spidev{}.{}'.format(*self.busaddr), speed)
+                    _SPIdev(f'/dev/spidev{bus}.{chip}', speed)
 
         self.spi = PiFace._spi[self.busaddr]
         self.spi.count += 1

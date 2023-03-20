@@ -46,20 +46,28 @@ write performance comparisons between [pifacedigitalio][] and
 The [pifaceio pypi package][pifaceio] is available from [PyPi][] so you
 can install it using [pip][]. If [pip][] is not already installed run:
 
-    sudo apt-get install python3-pip
+```sh
+sudo apt-get install python3-pip
+```
 
 Then use pip to install the [pifaceio][] package:
 
-    sudo pip3 install -U pifaceio
+```sh
+sudo pip3 install -U pifaceio
+```
 
 To set up permissions/groups/udev etc for spidev device on RPi, run the
 included script and then reboot.
 
-    sudo pifaceio-install-spidev.sh
+```sh
+sudo pifaceio-install-spidev.sh
+```
 
 ### UPGRADE
 
-    sudo pip3 install -U pifaceio
+```sh
+sudo pip3 install -U pifaceio
+```
 
 ### USAGE
 
@@ -68,7 +76,9 @@ Board addresses, input pins, and output pins are always numbered from 0.
 In general, you start with a once-off allocation of a PiFace board
 instance at startup with:
 
-    pf = pifaceio.PiFace()
+```python
+pf = pifaceio.PiFace()
+```
 
 Default is first PiFace board (0). Optionally takes an argument 0 to 7
 for up to 8 PiFace board addresses. Create multiple PiFace() instances
@@ -81,19 +91,25 @@ pifaceio.py for details.
 At each poll time, e.g. every part second, read all the inputs (i.e. the
 single input byte) with:
 
-    pf.read() # returns the input byte you can use directly if you prefer
+```python
+pf.read() # returns the input byte you can use directly if you prefer
+```
 
 Then read and write individual pins according to your logic with:
 
-    in_val = pf.read_pin(pin_in)
-    ..
-    pf.write_pin(pin_out, out_val)
-    ..
+```python
+in_val = pf.read_pin(pin_in)
+# ..
+pf.write_pin(pin_out, out_val)
+# ..
+```
 
 Finally, write all the outputs at the end of processing (i.e. write the
 single output byte) with:
 
-    pf.write() # optionally, takes an output byte to write directly
+```python
+pf.write() # optionally, takes an output byte to write directly
+```
 
 Note that `read_pin()` is just a convenience method wrapping a bit
 test around the previously read input byte from `read()` and
@@ -109,62 +125,70 @@ application.
 Simple example to just reflect all PiFace 8 inputs to the 8 outputs
 every 10 msec, on the default first PiFace board:
 
-    import pifaceio, time
-    pf = pifaceio.PiFace()
+```python
+import pifaceio, time
+pf = pifaceio.PiFace()
 
-    while True:
-        pf.write(pf.read())
-        time.sleep(.01)
+while True:
+    pf.write(pf.read())
+    time.sleep(.01)
+```
 
 Same example, but do it across 4 PiFace boards:
 
-    import pifaceio, time
-    pifaces = [pifaceio.PiFace(n) for n in range(4)]
+```python
+import pifaceio, time
+pifaces = [pifaceio.PiFace(n) for n in range(4)]
 
-    while True:
-        for pf in pifaces:
-            pf.write(pf.read())
-        time.sleep(.01)
+while True:
+    for pf in pifaces:
+        pf.write(pf.read())
+    time.sleep(.01)
+```
 
 Simple example to test if both input pin 0 and 1 are on at same time,
 and then set output pin 7 if true:
 
-    import pifaceio
-    pf = pifaceio.PiFace()
-    ...
-    # Fetch inputs (i.e. single byte)
-    pf.read()
-    first_two_inputs_on = pf.read_pin(0) and pf.read_pin(1)
+```python
+import pifaceio
+pf = pifaceio.PiFace()
+...
+# Fetch inputs (i.e. single byte)
+pf.read()
+first_two_inputs_on = pf.read_pin(0) and pf.read_pin(1)
 
-    # Now write that state to output pin 7
-    pf.write_pin(7, first_two_inputs_on)
+# Now write that state to output pin 7
+pf.write_pin(7, first_two_inputs_on)
 
-    # Do final (actual) write when all output pin states are set.
-    pf.write()
+# Do final (actual) write when all output pin states are set.
+pf.write()
+```
 
 Simulated "interrupt" processing example by light-weight poll every 10 msecs:
 
-    import pifaceio, time
-    pf = pifaceio.PiFace()
+```python
+import pifaceio, time
+pf = pifaceio.PiFace()
 
-    def process_change():
-        'On any changed inputs, read inputs and write outputs'
-        pf.write_pin(7, pf.read_pin(0) and pf.read_pin(1))
+def process_change():
+    'On any changed inputs, read inputs and write outputs'
+    pf.write_pin(7, pf.read_pin(0) and pf.read_pin(1))
 
-        # .. etc .. do logic using pf.read_pin() and pf.write_pin()
+    # .. etc .. do logic using pf.read_pin() and pf.write_pin()
 
-    # Loop forever polling inputs ..
-    last = None
-    while True:
-        data = pf.read()
+# Loop forever polling inputs ..
+last = None
+while True:
+    data = pf.read()
 
-        # Do processing only on change
-        if last != data:
-            last = data
-            process_change()
-            pf.write()        # note write() only writes if output changes
+    # Do processing only on change
+    if last != data:
+        last = data
+        process_change()
+        pf.write()        # note write() only writes if output changes
 
-        time.sleep(.01)
+    time.sleep(.01)
+```
 
 ### PIFACE PACKAGE BACKWARDS COMPATIBILITY
 
@@ -178,21 +202,25 @@ performance is still significantly superior to the original
 [performance
 comparison](#performance-benchmarks-against-pifacedigitalio) section.
 
-    #import piface.pfio as pf (change this line ..)
-    #import pifacedigitalio as pf (or this line .., to the following line)
-    import pifaceio as pf
+```python
+#import piface.pfio as pf (change this line ..)
+#import pifacedigitalio as pf (or this line .., to the following line)
+import pifaceio as pf
 
-    # The following calls should be approximately compatible:
-    pf.init()
-    value = pf.digital_read(pin)
-    pf.digital_write(pin, value)
-    pf.deinit()
+# The following calls should be approximately compatible:
+pf.init()
+value = pf.digital_read(pin)
+pf.digital_write(pin, value)
+pf.deinit()
+```
 
 You can also use multiple boards with this compatibility interface, e.g.
 as follows where board can be from 0 to 7.
 
-    value = pf.digital_read(pin, board)
-    pf.digital_write(pin, value, board)
+```python
+value = pf.digital_read(pin, board)
+pf.digital_write(pin, value, board)
+```
 
 ### LICENSE
 

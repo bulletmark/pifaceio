@@ -11,7 +11,7 @@ here = Path(__file__).resolve().parent
 
 setup(
     name=name,
-    version='1.35',
+    version='1.36',
     description='Python interface to the Raspberry Pi PiFace board',
     long_description=here.joinpath('README.md').read_text(),
     long_description_content_type="text/markdown",

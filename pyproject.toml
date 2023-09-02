@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pifaceio"
+description = "Python interface to the Raspberry Pi PiFace board"
+readme = "README.md"
+requires-python = ">=3.6"
+keywords = ["piface", "pifacedigitalio", "spidev", "raspberrypi", "rpi", "pi"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+]
+dynamic = ["version"]
+
+[[project.authors]]
+name = "Mark Blakeney"
+email = "mark.blakeney@bullet-systems.net"
+
+[project.urls]
+Homepage = "https://github.com/bulletmark/pifaceio"
+
+[project.license]
+text = "GPLv3"
+
+[tool.setuptools]
+script-files = ["pifaceio-install-spidev.sh"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+
+[tool.mypy]
+implicit_optional = true
+warn_no_return = false
+allow_untyped_globals = true
+allow_redefinition = true
+
+[tool.edit-lint]
+linters = [
+  "ruff",
+  "flake8",
+  "mypy",
+]
+
+# vim:se sw=2:

@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "pifaceio"
 description = "Python interface to the Raspberry Pi PiFace board"
 readme = "README.md"
+license = "GPL-3.0-or-later"
 requires-python = ">=3.6"
 keywords = ["piface", "pifacedigitalio", "spidev", "raspberrypi", "rpi", "pi"]
 classifiers = [
@@ -19,9 +20,6 @@ email = "mark.blakeney@bullet-systems.net"
 
 [project.urls]
 Homepage = "https://github.com/bulletmark/pifaceio"
-
-[project.license]
-text = "GPLv3"
 
 [tool.setuptools]
 script-files = ["pifaceio-install-spidev.sh"]

@@ -5,6 +5,7 @@ check:
 	ruff check $(PYNAME).py
 	mypy $(PYNAME).py
 	vermin -vv --exclude importlib.metadata --no-tips -i $(PYNAME).py
+	md-link-checker
 
 build:
 	rm -rf dist

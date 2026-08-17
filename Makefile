@@ -3,7 +3,7 @@ PYNAME = $(subst -,_,$(NAME))
 
 check:
 	ruff check $(PYNAME).py
-	mypy $(PYNAME).py
+	ty check $(PYNAME).py
 	vermin -vv --exclude importlib.metadata --no-tips -i $(PYNAME).py
 	md-link-checker
 

@@ -9,9 +9,6 @@ readme = "README.md"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.6"
 keywords = ["piface", "pifacedigitalio", "spidev", "raspberrypi", "rpi", "pi"]
-classifiers = [
-  "Programming Language :: Python :: 3",
-]
 dynamic = ["version"]
 
 [[project.authors]]
@@ -27,16 +24,10 @@ script-files = ["pifaceio-install-spidev.sh"]
 [tool.setuptools_scm]
 version_scheme = "post-release"
 
-[tool.mypy]
-implicit_optional = true
-warn_no_return = false
-allow_untyped_globals = true
-allow_redefinition = true
+[tool.ruff.format]
+quote-style = "single"
 
-[tool.edit-lint]
-linters = [
-  "ruff check",
-  "mypy",
-]
+[tool.ruff.lint]
+ignore = ["SIM115", "SIM905", "BLE001", "PLW1510", "S110", "DTZ"]
 
 # vim:se sw=2:

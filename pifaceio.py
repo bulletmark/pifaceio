@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 '''
 This package provides a pure Python interface to the PiFace Digital
 peripheral board for the Raspberry Pi. This package allows a Python
@@ -9,9 +8,10 @@ so is also supported by this package.
 '''
 # (C) Mark Blakeney, blakeney.mark@gmail.com, 2013.
 
-import struct
 import ctypes
 import fcntl
+import struct
+from typing import ClassVar
 
 # MCP23S17 Register addresses we are interested in. See MCP23S17 data sheet.
 _RA_IODIRA = 0  # I/O direction A
@@ -63,7 +63,7 @@ class _SPIdev:
 
 class PiFace:
     'Allocate an instance of this class for each single PiFace board'
-    _spi = {}
+    _spi: ClassVar = {}
 
     def __init__(self, board=0, pull_ups=0xff, read_polarity=0x00,
             write_polarity=0xff, init_board=True, bus=0, chip=0,
@@ -198,7 +198,7 @@ def init(init_board=True, *args, **kwargs):
     'piface package compatible init()'
     global _pifaces
     deinit()
-    _pifaces = [PiFace(b, init_board=init_board, *args, **kwargs)
+    _pifaces = [PiFace(b, *args, init_board=init_board,  **kwargs)
             for b in range(8)]
 
     # piface package explicitly inits outputs to zero so we will too
@@ -212,7 +212,7 @@ def _get_board(board):
     if not _pifaces:
         init()
 
-    return _pifaces[board]
+    return _pifaces[board]  # type: ignore
 
 def digital_read(pin, board=0):
     'piface package compatible digital_read()'
